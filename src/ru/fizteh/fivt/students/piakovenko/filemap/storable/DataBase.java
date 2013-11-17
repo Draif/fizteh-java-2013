@@ -274,19 +274,19 @@ public class DataBase implements Table {
     private void saveClasses() {
         try{
             int curLength = 0;
-            File fileWithClasses = new File(nameOfFileWithTypes);
+            File fileWithClasses = new File(dataBaseStorage, nameOfFileWithTypes);
             if (!fileWithClasses.exists()) {
                 fileWithClasses.createNewFile();
             }
-            BufferedWriter writer = new BufferedWriter(new FileWriter(fileWithClasses));
+            FileWriter writer = new FileWriter(fileWithClasses);
             String temp = null;
             for (int i = 0; i < storeableClasses.size() - 1; ++i) {
                 temp = Utils.stringByClass(storeableClasses.get(i)) + " ";
-                writer.write(temp, curLength, temp.length());
+                writer.write(temp);
                 curLength += temp.length();
             }
             temp = Utils.stringByClass(storeableClasses.get(storeableClasses.size() - 1));
-            writer.write(temp, curLength, temp.length());
+            writer.write(temp);
             writer.close();
         } catch (IOException e) {
             System.out.println("Error! " + e.getMessage());
@@ -358,12 +358,12 @@ public class DataBase implements Table {
     public void saveDataBase () throws IOException {
         if (dataBaseStorage.isFile()) {
             try {
-                //saveToFile();
+                saveToFile();
             } finally {
                 raDataBaseFile.close();
             }
         } else {
-            //saveToDirectory();
+            saveToDirectory();
         }
     }
 
