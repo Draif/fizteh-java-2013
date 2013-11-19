@@ -35,7 +35,10 @@ public class Element implements Storeable {
 
     public Element(List<Class<?>> classes) {
         storageClasses = new ArrayList<Class<?>>(classes);
-        storage = new ArrayList<Object>(classes.size());
+        storage = new ArrayList<Object>();
+        for (int i = 0; i < storageClasses.size(); ++i) {
+            storage.add(null);
+        }
     }
 
     public void setColumnAt(int columnIndex, Object value) throws ColumnFormatException, IndexOutOfBoundsException {
