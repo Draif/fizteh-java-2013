@@ -156,7 +156,7 @@ public class DataBasesCommander implements TableProvider {
         }
 
         for (final Class<?> columnType : columnTypes) {
-            if (columnType == null || Utils.stringByClass(columnType) == null) {
+            if (columnType == null || ColumnTypes.fromTypeToName(columnType) == null) {
                 throw new IllegalArgumentException("unknown column type");
             }
         }
