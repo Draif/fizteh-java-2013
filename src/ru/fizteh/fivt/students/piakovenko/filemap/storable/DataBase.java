@@ -338,7 +338,7 @@ public class DataBase implements Table {
         String types = reader.readLine();
         Class<?> temp = null;
         for (String type : types.trim().split("\\s")){
-            temp = Utils.classByString(type);
+            temp = ColumnTypes.fromNameToType(type);
             if (temp == null) {
                 throw new IOException("wrong type!");
             } else {
