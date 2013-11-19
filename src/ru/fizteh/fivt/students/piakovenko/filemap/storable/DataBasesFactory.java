@@ -29,7 +29,7 @@ public class DataBasesFactory implements TableProviderFactory {
             lock.writeLock().lock();
             fileMapStorage = new File(dir);
             if (!fileMapStorage.exists()) {
-                throw new IllegalArgumentException("no such file!" + fileMapStorage.getCanonicalPath());
+                throw new IOException("no such file!" + fileMapStorage.getCanonicalPath());
             }
             if (fileMapStorage.isFile()) {
                 throw new IllegalArgumentException("try create provider on file");
