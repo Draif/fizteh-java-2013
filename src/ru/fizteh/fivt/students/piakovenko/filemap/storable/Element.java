@@ -19,7 +19,7 @@ public class Element implements Storeable {
     private List<Object> storage = null;
 
     private boolean columnChecker(int columnIndex) {
-        if (columnIndex < 0 || columnIndex >= storage.size()) {
+        if (columnIndex < 0 || columnIndex >= storageClasses.size()) {
             return false;
         }
         return true;
@@ -34,11 +34,8 @@ public class Element implements Storeable {
 
 
     public Element(List<Class<?>> classes) {
-        storageClasses = new ArrayList<Class<?>>(classes.size());
+        storageClasses = new ArrayList<Class<?>>(classes);
         storage = new ArrayList<Object>(classes.size());
-        for (int i = 0; i < classes.size(); ++i) {
-            storageClasses.add(classes.get(i));
-        }
     }
 
     public void setColumnAt(int columnIndex, Object value) throws ColumnFormatException, IndexOutOfBoundsException {
