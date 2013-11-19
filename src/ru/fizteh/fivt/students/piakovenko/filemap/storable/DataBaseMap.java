@@ -64,16 +64,58 @@ public class DataBaseMap {
         return map;
     }
 
-    public void commit(Map<String, Storeable> _newMap, Set<String> _removed) {
-        for (final String removed: _removed.toArray(new String[0])) {
-            map.remove(removed);
-        }
-        for (final String added: _newMap.keySet()) {
-            if (map.containsKey(added)) {
-                map.remove(added);
+    public int commit(Map<String, Storeable> _newMap) {
+        int count = 0;
+        for (final String key: _newMap.keySet()) {
+            Storeable tempValue = _newMap.get(key);
+            if (wasChanged(tempValue, map.get(key))) {
+                if (tempValue == null) {
+                    map.remove(key);
+                }
+                else {
+                    map.put(key, tempValue);
+                }
+                ++count;
             }
-            map.put(added, _newMap.get(added));
         }
+        return count;
     }
 
+    public int changesCount(Map<String, Storeable> _newMap) {
+        int count = 0;
+        for (final String key: _newMap.keySet()) {
+            Storeable tempValue = _newMap.get(key);
+            if (wasChanged(tempValue, map.get(key))) {
+                ++count;
+            }
+        }
+        return count;
+    }
+
+    public int currentSize(Map<String, Storeable> _newMap) {
+        int count = map.size();
+        for (final String key: _newMap.keySet()) {
+            Storeable newValue = _newMap.get(key);
+            Storeable oldValue = map.get(key);
+            if (newValue == null && oldValue != null) {
+                --count;
+            } else if (newValue != null && oldValue == null) {
+                ++count;
+            }
+        }
+        return count;
+    }
+
+    private boolean wasChanged(Storeable value1, Storeable value2) {
+        boolean flag = false;
+        if (value1 == null && value2 == null){
+            return false;
+        } else if (value1 == null) {
+            return true;
+        } else if (value2 == null) {
+            return true;
+        }
+        flag = value1.equals(value2);
+        return flag;
+    }
 }
