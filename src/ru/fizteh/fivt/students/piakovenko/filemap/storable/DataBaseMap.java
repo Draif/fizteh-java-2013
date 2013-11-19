@@ -115,7 +115,7 @@ public class DataBaseMap {
         } else if (value2 == null) {
             return true;
         }
-        flag = value1.equals(value2);
+        flag = !value1.equals(value2);
         return flag;
     }
 }
