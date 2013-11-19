@@ -17,7 +17,9 @@ import java.io.*;
 import java.lang.Math;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,6 +38,81 @@ public class DataBase implements Table {
     private List<Class<?>> storeableClasses;
     private final String nameOfFileWithTypes = "signature.tsv";
     private TableProvider parent = null;
+    private ThreadLocal<Transaction> transaction;
+    protected final Lock lock = new ReentrantLock(true);
+
+    private class Transaction {
+        private Map<String, Storeable> transactionMap = null;
+        private Set<String> removedMap = null;
+
+        public Transaction() {
+            transactionMap = new HashMap<String, Storeable>();
+            removedMap = new HashSet<String>();
+        }
+
+        public Storeable put(String key, Storeable value) {
+            Storeable returnValue = null;
+            if (transactionMap.containsKey(key)) {
+                returnValue = transactionMap.get(key);
+                transactionMap.remove(key);
+            } else if (map.getMap().containsKey(key)) {
+                returnValue = map.get(key);
+            }
+            transactionMap.put(key, value);
+            if (removedMap.contains(key)) {
+                removedMap.remove(key);
+            }
+            return returnValue;
+        }
+
+        public Storeable get(String key) {
+            if (transactionMap.containsKey(key)) {
+                return transactionMap.get(key);
+            }
+            return map.getMap().get(key);
+        }
+
+        public Storeable remove(String key) {
+            Storeable removedValue = null;
+            if (transactionMap.containsKey(key)) {
+                removedValue = transactionMap.get(key);
+            } else if (map.getMap().containsKey(key)) {
+                removedValue = map.getMap().get(key);
+                removedMap.add(key);
+            }
+            return removedValue;
+        }
+
+        public int changesCount() {
+            int changes = 0;
+            changes += removedMap.size();
+            for (final String key: transactionMap.keySet()) {
+                if (!map.getMap().containsKey(key)) {
+                    ++changes;
+                } else {
+                    if (!map.getMap().get(key).equals(transactionMap.get(key))) {
+                        ++changes;
+                    }
+                }
+            }
+            return changes;
+        }
+
+        public void commit() {
+            map.commit(transactionMap, removedMap);
+            transactionMap.clear();
+            removedMap.clear();
+        }
+
+        public int size() {
+            return transactionMap.size() + map.getMap().size() - removedMap.size();
+        }
+
+        public void rollback() {
+            transactionMap.clear();
+            removedMap.clear();
+        }
+    }
 
     private boolean isValidNameDirectory(String name){
         if (name.length() < 5 || name.length() > 6)
@@ -247,7 +324,6 @@ public class DataBase implements Table {
         }
     }
 
-
     private void readClasses() throws IOException {
         File fileWithClasses = null;
         if (dataBaseStorage.isDirectory()) {
@@ -294,8 +370,6 @@ public class DataBase implements Table {
         }
     }
 
-
-
     public DataBase (Shell sl, File storage, TableProvider _parent, List<Class<?>> columnTypes) {
         map = new DataBaseMap();
         shell  = sl;
@@ -304,7 +378,13 @@ public class DataBase implements Table {
         changed = 0;
         parent = _parent;
         storeableClasses = columnTypes;
-        saveClasses();
+        //saveClasses();
+        transaction = new ThreadLocal<Transaction>() {
+           @Override
+           protected Transaction initialValue() {
+            return new Transaction();
+           }
+        };
     }
 
     public DataBase (Shell sl, File storage, TableProvider _parent) {
@@ -314,6 +394,12 @@ public class DataBase implements Table {
         name = storage.getName();
         changed = 0;
         parent = _parent;
+        transaction = new ThreadLocal<Transaction>() {
+            @Override
+            protected Transaction initialValue() {
+                return new Transaction();
+            }
+        };
         try {
             readClasses();
         } catch (IOException e) {
@@ -371,24 +457,14 @@ public class DataBase implements Table {
         if (key == null) {
             throw new IllegalArgumentException("key equals NULL");
         }
-       return map.get(key);
+       return transaction.get().get(key);
     }
 
     public Storeable put (String key, Storeable value) throws IllegalArgumentException {
         if (key == null || value == null || key.trim().equals("")) {
             throw new IllegalArgumentException("key or value equals NULL");
         }
-        Storeable putValue = map.put(key, value);
-        if (putValue == null) {
-            ++changed;
-            map.getChangedMap().put(key, value);
-        } else {
-            if (map.getChangedMap().containsKey(key) || map.getOverwriteMap().containsKey(key)){
-            } else {
-                map.getOverwriteMap().put(key, value);
-                ++changed;
-            }
-        }
+        Storeable putValue = transaction.get().put(key, value);
         return putValue;
     }
 
@@ -396,16 +472,7 @@ public class DataBase implements Table {
         if (key == null) {
             throw new IllegalArgumentException("key equals null");
         }
-        Storeable removed = map.remove(key);
-        if (removed != null) {
-            if (map.getChangedMap().containsKey(key)) {
-                map.getChangedMap().remove(key);
-                --changed;
-            } else if (map.getOverwriteMap().containsKey(key)) {
-            } else {
-                ++changed;
-            }
-        }
+        Storeable removed = transaction.get().remove(key);
         return removed;
     }
 
@@ -414,43 +481,36 @@ public class DataBase implements Table {
     }
 
     public int size() {
-        System.out.println(map.getMap().size());
-        return map.getMap().size();
+        System.out.println(transaction.get().size());
+        return transaction.get().size();
     }
 
     public int commit () {
-        int tempChanged = changed;
+        int tempChanged = transaction.get().changesCount();
+        transaction.get().commit();
         try {
+            lock.lock();
             saveDataBase();
-            changed = 0;
-            map.getChangedMap().clear();
             System.out.println(tempChanged);
             return tempChanged;
         } catch (IOException e) {
             System.err.println("Error! " + e.getMessage());
             System.exit(1);
+        }  finally {
+            lock.unlock();
         }
         return 0;
     }
 
     public int rollback () {
-        int tempChanged = changed;
-        map.getMap().clear();
-        map.getChangedMap().clear();
-        try {
-            load();
-            System.out.println(changed);
-            changed = 0;
-            return tempChanged;
-        } catch (IOException e) {
-            System.err.println("Error! " + e.getMessage());
-            System.exit(1);
-        }
-        return 0;
+        int tempChanged = transaction.get().changesCount();
+        transaction.get().rollback();
+        System.out.println(tempChanged);
+        return tempChanged;
     }
 
     public int numberOfChanges () {
-        return changed;
+        return transaction.get().changesCount();
     }
 
     public int getColumnsCount() {

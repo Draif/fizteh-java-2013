@@ -4,6 +4,7 @@ import ru.fizteh.fivt.storage.structured.Storeable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -63,12 +64,16 @@ public class DataBaseMap {
         return map;
     }
 
-    public Map<String, Storeable> getChangedMap() {
-        return changedMap;
-    }
-
-    public Map<String, Storeable> getOverwriteMap() {
-        return overwriteMap;
+    public void commit(Map<String, Storeable> _newMap, Set<String> _removed) {
+        for (final String removed: _removed.toArray(new String[0])) {
+            map.remove(removed);
+        }
+        for (final String added: _newMap.keySet()) {
+            if (map.containsKey(added)) {
+                map.remove(added);
+            }
+            map.put(added, _newMap.get(added));
+        }
     }
 
 }
