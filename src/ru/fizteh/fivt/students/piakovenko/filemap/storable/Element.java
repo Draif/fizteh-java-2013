@@ -117,7 +117,7 @@ public class Element implements Storeable {
         if (!columnChecker(columnIndex)) {
             throw  new IndexOutOfBoundsException("getStringAt - wrong index!");
         }
-        classChecker(columnIndex, Double.class);
+        classChecker(columnIndex, String.class);
         return (String)storage.get(columnIndex);
     }
 
