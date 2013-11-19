@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,6 +34,7 @@ public class DataBasesCommander implements TableProvider {
     private Shell shell = null;
     private GlobalFileMapState state = null;
     private static final String TABLE_NAME_FORMAT = "[A-Za-zА-Яа-я0-9]+";
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
 
     private static File getMode (File directory) {
         for (File f: directory.listFiles()) {
@@ -108,22 +111,27 @@ public class DataBasesCommander implements TableProvider {
         if (dataBase == null || dataBase.trim().equals("")) {
             throw new IllegalArgumentException("Null pointer to dataBase name");
         }
-        if (filesMap.containsKey(dataBase)) {
-            if (filesMap.get(dataBase).equals(currentDataBase)) {
-                currentDataBase = null;
-                state.changeTable(currentDataBase);
+        try {
+            readWriteLock.writeLock().lock();
+            if (filesMap.containsKey(dataBase)) {
+                if (filesMap.get(dataBase).equals(currentDataBase)) {
+                    currentDataBase = null;
+                    state.changeTable(currentDataBase);
+                }
+                try {
+                    ru.fizteh.fivt.students.piakovenko.shell.Remove.removeRecursively(filesMap.get(dataBase).returnFiledirectory());
+                } catch (IOException e) {
+                    System.err.println("Error! " + e.getMessage());
+                    System.exit(1);
+                }
+                filesMap.remove(dataBase);
+                System.out.println("dropped");
+            } else {
+                System.out.println(dataBase + " not exists");
+                throw new IllegalStateException(dataBase +" not exists");
             }
-            try {
-                ru.fizteh.fivt.students.piakovenko.shell.Remove.removeRecursively(filesMap.get(dataBase).returnFiledirectory());
-            } catch (IOException e) {
-                System.err.println("Error! " + e.getMessage());
-                System.exit(1);
-            }
-            filesMap.remove(dataBase);
-            System.out.println("dropped");
-        } else {
-            System.out.println(dataBase + " not exists");
-            throw new IllegalStateException(dataBase +" not exists");
+        } finally {
+            readWriteLock.writeLock().unlock();
         }
     }
 
@@ -135,24 +143,30 @@ public class DataBasesCommander implements TableProvider {
         if (!dataBase.matches(TABLE_NAME_FORMAT)) {
             throw new RuntimeException("incorrect table name");
         }
-        if (filesMap.containsKey(dataBase)) {
-            System.out.println(dataBase + " exists");
-        } else {
-            File newFileMap = new File(dataBaseDirectory, dataBase);
-            if (newFileMap.isFile()) {
-                throw  new IllegalArgumentException("try create table on file");
+        try {
+            readWriteLock.writeLock().lock();
+            if (filesMap.containsKey(dataBase)) {
+                System.out.println(dataBase + " exists");
+            } else {
+                File newFileMap = new File(dataBaseDirectory, dataBase);
+                if (newFileMap.isFile()) {
+                    throw  new IllegalArgumentException("try create table on file");
+                }
+                if (!newFileMap.mkdirs()){
+                    System.err.println("Unable to create this directory - " + dataBase);
+                    System.exit(1);
+                }
+                System.out.println("created");
+                filesMap.put(dataBase, new DataBase(shell, newFileMap, this, columnTypes));
+                return filesMap.get(dataBase);
             }
-            if (!newFileMap.mkdirs()){
-                System.err.println("Unable to create this directory - " + dataBase);
-                System.exit(1);
-            }
-            System.out.println("created");
-            filesMap.put(dataBase, new DataBase(shell, newFileMap, this, columnTypes));
-            return filesMap.get(dataBase);
+            return null;
+        } finally {
+            readWriteLock.writeLock().unlock();
         }
-        return null;
     }
 
+    @Override
     public Table getTable(String name) throws IllegalArgumentException {
         if (name == null || name.trim().equals("")) {
             throw new IllegalArgumentException("Null pointer to name of Table");
@@ -160,10 +174,16 @@ public class DataBasesCommander implements TableProvider {
         if (!name.matches(TABLE_NAME_FORMAT)) {
             throw new RuntimeException("incorrect table name");
         }
-        if (filesMap.containsKey(name)) {
-            return filesMap.get(name);
+        try {
+            readWriteLock.readLock().lock();
+            if (filesMap.containsKey(name)) {
+                return filesMap.get(name);
+            } else {
+                return null;
+            }
+        } finally {
+            readWriteLock.readLock().unlock();
         }
-        return null;
     }
 
     public Storeable deserialize(Table table, String value) throws ParseException {
