@@ -347,29 +347,6 @@ public class DataBase implements Table {
         }
     }
 
-    private void saveClasses() {
-        try{
-            int curLength = 0;
-            File fileWithClasses = new File(dataBaseStorage, nameOfFileWithTypes);
-            if (!fileWithClasses.exists()) {
-                fileWithClasses.createNewFile();
-            }
-            FileWriter writer = new FileWriter(fileWithClasses);
-            String temp = null;
-            for (int i = 0; i < storeableClasses.size() - 1; ++i) {
-                temp = Utils.stringByClass(storeableClasses.get(i)) + " ";
-                writer.write(temp);
-                curLength += temp.length();
-            }
-            temp = Utils.stringByClass(storeableClasses.get(storeableClasses.size() - 1));
-            writer.write(temp);
-            writer.close();
-        } catch (IOException e) {
-            System.out.println("Error! " + e.getMessage());
-            System.exit(1);
-        }
-    }
-
     public DataBase (Shell sl, File storage, TableProvider _parent, List<Class<?>> columnTypes) {
         map = new DataBaseMap();
         shell  = sl;
@@ -378,7 +355,6 @@ public class DataBase implements Table {
         changed = 0;
         parent = _parent;
         storeableClasses = columnTypes;
-        //saveClasses();
         transaction = new ThreadLocal<Transaction>() {
            @Override
            protected Transaction initialValue() {
