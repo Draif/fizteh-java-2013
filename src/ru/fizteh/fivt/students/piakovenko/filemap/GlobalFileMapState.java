@@ -110,11 +110,7 @@ public class GlobalFileMapState {
         if (isStoreableMode) {
             Storeable putValue = null;
             try {
-                List<Class<?>> columnTypes = new ArrayList<Class<?>>();
-                for (int i = 0; i < tableStoreable.getColumnsCount(); ++i) {
-                    columnTypes.add(tableStoreable.getColumnType(i));
-                }
-                putValue = JSONSerializer.deserialize(tableStoreable, value, columnTypes);
+                putValue = JSONSerializer.deserialize(tableStoreable, value);
             } catch (ParseException e) {
                 throw new IOException(e.getCause());
             }
