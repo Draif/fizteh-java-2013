@@ -176,7 +176,7 @@ public class DataBase implements Table {
                 length -= l2;
             }
             try {
-                map.primaryPut(new String(key, StandardCharsets.UTF_8), JSONSerializer.deserialize(this, new String(value, StandardCharsets.UTF_8)));
+                map.primaryPut(new String(key, StandardCharsets.UTF_8), JSONSerializer.deserialize(this, new String(value, StandardCharsets.UTF_8), storeableClasses));
             } catch (ParseException e) {
                 System.err.println("readFromFile: problem with desereliaze" + e.getMessage());
                 System.exit(1);
@@ -223,7 +223,7 @@ public class DataBase implements Table {
                     throw new IOException("Wrong place of key value! Key: " + keyString + " Value: " + valueString);
                 } else {
                     try {
-                        map.primaryPut(keyString, JSONSerializer.deserialize(this, valueString));
+                        map.primaryPut(keyString, JSONSerializer.deserialize(this, valueString, storeableClasses));
                     } catch (ParseException e) {
                         System.err.println("readFromFile: problem with deserializer" + e.getMessage());
                         System.exit(1);

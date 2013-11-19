@@ -6,6 +6,7 @@ import ru.fizteh.fivt.storage.structured.Table;
 import ru.fizteh.fivt.students.piakovenko.filemap.storable.Element;
 
 import java.text.ParseException;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,8 +16,8 @@ import java.text.ParseException;
  * To change this template use File | Settings | File Templates.
  */
 public class JSONSerializer {
-    public static Storeable deserialize(Table table, String value) throws ParseException {
-        Storeable newStoreable = new Element();
+    public static Storeable deserialize(Table table, String value, List<Class<?>> columnsTypes) throws ParseException {
+        Storeable newStoreable = new Element(columnsTypes);
         try {
             JSONArray json = new JSONArray(value);
             Object temp = null;

@@ -32,11 +32,6 @@ public class Element implements Storeable {
         return false;
     }
 
-    public Element () {
-        storageClasses = new ArrayList<Class<?>>();
-        storage = new ArrayList<Object>();
-    }
-
 
     public Element(List<Class<?>> classes) {
         storageClasses = new ArrayList<Class<?>>(classes.size());
@@ -47,14 +42,11 @@ public class Element implements Storeable {
     }
 
     public void setColumnAt(int columnIndex, Object value) throws ColumnFormatException, IndexOutOfBoundsException {
-        if (!columnChecker(columnIndex)) {
-            throw  new IndexOutOfBoundsException("setColumnAt - wrong index!");
-        }
-        if (storageClasses.size() <= columnIndex) {
-            storageClasses.set(columnIndex, value.getClass());
-        }
         if (!classChecker(columnIndex, value)) {
             throw new ColumnFormatException("setColumnAt - wrong type of class!");
+        }
+        if (!columnChecker(columnIndex)) {
+            throw  new IndexOutOfBoundsException("setColumnAt - wrong index!");
         }
         storage.set(columnIndex, value);
     }
