@@ -136,29 +136,46 @@ public class DataBasesCommander implements TableProvider {
     }
 
     @Override
-    public Table createTable (String dataBase, List<Class<?>> columnTypes) throws IOException, IllegalArgumentException {
-        if (dataBase == null || dataBase.trim().equals("")) {
+    public Table createTable (String name, List<Class<?>> columnTypes) throws IOException, IllegalArgumentException {
+        if (name == null || name.trim().equals("")) {
             throw new IllegalArgumentException("Null pointer to name!");
         }
-        if (!dataBase.matches(TABLE_NAME_FORMAT)) {
+        if (!name.matches(TABLE_NAME_FORMAT)) {
             throw new RuntimeException("incorrect table name");
+        }
+        if (name == null || (name.isEmpty() || name.trim().isEmpty())) {
+            throw new IllegalArgumentException("table's name cannot be null");
+        }
+        if (name.contains("\\") || name.contains("/") || name.contains(">") || name.contains("<")
+                || name.contains("\"") || name.contains(":") || name.contains("?") || name.contains("|")
+                || name.startsWith(".") || name.endsWith(".")) {
+            throw new RuntimeException("Bad symbols in tablename " + name);
+        }
+        if (columnTypes == null || columnTypes.isEmpty()) {
+            throw new IllegalArgumentException("column types cannot be null");
+        }
+
+        for (final Class<?> columnType : columnTypes) {
+            if (columnType == null || Utils.stringByClass(columnType) == null) {
+                throw new IllegalArgumentException("unknown column type");
+            }
         }
         try {
             readWriteLock.writeLock().lock();
-            if (filesMap.containsKey(dataBase)) {
-                System.out.println(dataBase + " exists");
+            if (filesMap.containsKey(name)) {
+                System.out.println(name + " exists");
             } else {
-                File newFileMap = new File(dataBaseDirectory, dataBase);
+                File newFileMap = new File(dataBaseDirectory, name);
                 if (newFileMap.isFile()) {
                     throw  new IllegalArgumentException("try create table on file");
                 }
                 if (!newFileMap.mkdirs()){
-                    System.err.println("Unable to create this directory - " + dataBase);
+                    System.err.println("Unable to create this directory - " + name);
                     System.exit(1);
                 }
                 System.out.println("created");
-                filesMap.put(dataBase, new DataBase(shell, newFileMap, this, columnTypes));
-                return filesMap.get(dataBase);
+                filesMap.put(name, new DataBase(shell, newFileMap, this, columnTypes));
+                return filesMap.get(name);
             }
             return null;
         } finally {
