@@ -181,10 +181,10 @@ public class TestForStoreable {
 
     @Test
     public void rollbackCommit() {
-        try{
+        try {
             for (int index = 0; index < KEYS_COUNT; ++index) {
                 String key = String.format("key%d", index);
-                table.put(key, JSONSerializer.deserialize(table,String.format("[\"value%d\"]", index)));
+                table.put(key, JSONSerializer.deserialize(table, String.format("[\"value%d\"]", index)));
             }
             table.commit();
             for (int index = 0; index < KEYS_COUNT; ++index) {
@@ -193,20 +193,20 @@ public class TestForStoreable {
             }
             for (int index = 0; index < KEYS_COUNT; ++index) {
                 String key = String.format("key%d", index);
-                table.put(key, JSONSerializer.deserialize(table,String.format("[\"value%d\"]", index)));
+                table.put(key, JSONSerializer.deserialize(table, String.format("[\"value%d\"]", index)));
             }
             Assert.assertEquals(0, table.rollback());
 
             table.remove("non-exists");
             table.remove("non-exists1");
             table.remove("key1");
-            table.put("key1", JSONSerializer.deserialize(table,String.format("[\"value1\"]")));
+            table.put("key1", JSONSerializer.deserialize(table, String.format("[\"value1\"]")));
             Assert.assertEquals(0, table.rollback());
 
-            table.put("key1", JSONSerializer.deserialize(table,String.format("[\"value1\"]")));
+            table.put("key1", JSONSerializer.deserialize(table, String.format("[\"value1\"]")));
             table.commit();
             table.remove("key1");
-            table.put("key1", JSONSerializer.deserialize(table,String.format("[\"value1\"]")));
+            table.put("key1", JSONSerializer.deserialize(table, String.format("[\"value1\"]")));
             Assert.assertEquals(0, table.rollback());
         } catch (IOException e) {
             System.exit(1);

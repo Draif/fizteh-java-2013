@@ -15,7 +15,6 @@ import ru.fizteh.fivt.students.piakovenko.shell.Remove;
 import ru.fizteh.fivt.students.piakovenko.shell.Shell;
 
 import java.io.*;
-import java.lang.Math;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
@@ -35,7 +34,6 @@ public class DataBase implements Table {
     private DataBaseMap map = null;
     private Shell shell = null;
     private File dataBaseStorage = null;
-    private int changed;
     private List<Class<?>> storeableClasses;
     private final String nameOfFileWithTypes = "signature.tsv";
     private TableProvider parent = null;
@@ -108,34 +106,40 @@ public class DataBase implements Table {
         throw new ColumnFormatException("Alien storeable with more columns");
     }
 
-    private boolean isValidNameDirectory(String name){
-        if (name.length() < 5 || name.length() > 6)
+    private boolean isValidNameDirectory(String name) {
+        if (name.length() < 5 || name.length() > 6) {
             return false;
+        }
         int number = Integer.parseInt(name.substring(0, name.indexOf('.')), 10);
-        if (number > 15 || number < 0)
+        if (number > 15 || number < 0) {
             return false;
-        if (!name.substring(name.indexOf('.') + 1).equals("dir"))
+        }
+        if (!name.substring(name.indexOf('.') + 1).equals("dir")) {
             return false;
+        }
         return true;
     }
 
-    private boolean isValidNameFile(String name){
-        if (name.length() < 5 || name.length() > 6)
+    private boolean isValidNameFile(String name) {
+        if (name.length() < 5 || name.length() > 6) {
             return false;
+        }
         int number = Integer.parseInt(name.substring(0, name.indexOf('.')), 10);
-        if (number > 15 || number < 0)
+        if (number > 15 || number < 0) {
             return false;
-        if (!name.substring(name.indexOf('.') + 1).equals("dat"))
+        }
+        if (!name.substring(name.indexOf('.') + 1).equals("dat")) {
             return false;
+        }
         return true;
     }
 
-    private int ruleNumberDirectory (String key) {
+    private int ruleNumberDirectory(String key) {
         int b = Math.abs(key.getBytes()[0]);
         return b % 16;
     }
 
-    private int ruleNumberFile (String key) {
+    private int ruleNumberFile(String key) {
         int b = Math.abs(key.getBytes()[0]);
         return b / 16 % 16;
     }
@@ -170,7 +174,9 @@ public class DataBase implements Table {
                 length -= l2;
             }
             try {
-                map.primaryPut(new String(key, StandardCharsets.UTF_8), JSONSerializer.deserialize(this, new String(value, StandardCharsets.UTF_8)));
+                map.primaryPut(new String(
+                        key, StandardCharsets.UTF_8), JSONSerializer.deserialize(
+                        this, new String(value, StandardCharsets.UTF_8)));
             } catch (ParseException e) {
                 System.err.println("readFromFile: problem with desereliaze" + e.getMessage());
                 System.exit(1);
@@ -178,7 +184,7 @@ public class DataBase implements Table {
         }
     }
 
-    private void readFromFile (File storage, int numberOfDirectory) throws IOException {
+    private void readFromFile(File storage, int numberOfDirectory) throws IOException {
         RandomAccessFile ra = null;
         try {
             ra = new RandomAccessFile(storage, "rw");
@@ -234,7 +240,7 @@ public class DataBase implements Table {
         }
     }
 
-    private void saveToFile () throws IOException {
+    private void saveToFile() throws IOException {
         long length  = 0;
         raDataBaseFile.seek(0);
         for (String key: map.getMap().keySet()) {
@@ -265,23 +271,23 @@ public class DataBase implements Table {
         }
     }
 
-    private void saveToDirectory() throws IOException{
+    private void saveToDirectory() throws IOException {
         if (dataBaseStorage.exists()) {
             Remove.removeRecursively(dataBaseStorage);
         }
-        if (!dataBaseStorage.mkdirs()){
+        if (!dataBaseStorage.mkdirs()) {
             throw new IOException("Unable to create this directory - " + dataBaseStorage.getCanonicalPath());
         }
         for (String key : map.getMap().keySet()) {
             Integer numberOfDirectory = ruleNumberDirectory(key);
             Integer numberOfFile = ruleNumberFile(key);
-            File directory = new File (dataBaseStorage, numberOfDirectory.toString() + ".dir");
+            File directory = new File(dataBaseStorage, numberOfDirectory.toString() + ".dir");
             if (!directory.exists()) {
-                if (!directory.mkdirs()){
+                if (!directory.mkdirs()) {
                     throw new IOException("Unable to create this directory - " + directory.getCanonicalPath());
                 }
             }
-            File writeFile = new File(directory, numberOfFile.toString() + ".dat" );
+            File writeFile = new File(directory, numberOfFile.toString() + ".dat");
             if (!writeFile.exists()) {
                 writeFile.createNewFile();
             }
@@ -289,7 +295,7 @@ public class DataBase implements Table {
         }
     }
 
-    private void loadDataBase (File dataBaseFile) throws IOException {
+    private void loadDataBase(File dataBaseFile) throws IOException {
         raDataBaseFile = new RandomAccessFile(dataBaseFile, "rw");
         try {
             readFromFile();
@@ -308,7 +314,7 @@ public class DataBase implements Table {
         }
     }
 
-    private void loadFromDirectory (File directory) throws IOException {
+    private void loadFromDirectory(File directory) throws IOException {
         for (File f : directory.listFiles()) {
             if (!isValidNameDirectory(f.getName())) {
                 throw new IOException("Wrong name of directory!");
@@ -323,7 +329,7 @@ public class DataBase implements Table {
         if (dataBaseStorage.isDirectory()) {
             fileWithClasses = new File(nameOfFileWithTypes);
         } else {
-            fileWithClasses = new File (dataBaseStorage.getParent(), nameOfFileWithTypes);
+            fileWithClasses = new File(dataBaseStorage.getParent(), nameOfFileWithTypes);
         }
         if (!fileWithClasses.exists()) {
             throw new IOException("no file with classes!");
@@ -331,7 +337,7 @@ public class DataBase implements Table {
         BufferedReader reader = new BufferedReader(new FileReader(fileWithClasses));
         String types = reader.readLine();
         Class<?> temp = null;
-        for (String type : types.trim().split("\\s")){
+        for (String type : types.trim().split("\\s")) {
             temp = ColumnTypes.fromNameToType(type);
             if (temp == null) {
                 throw new IOException("wrong type!");
@@ -341,13 +347,12 @@ public class DataBase implements Table {
         }
     }
 
-    public DataBase (Shell sl, File storage, TableProvider _parent, List<Class<?>> columnTypes) {
+    public DataBase(Shell sl, File storage, TableProvider parent, List<Class<?>> columnTypes) {
         map = new DataBaseMap();
         shell  = sl;
         dataBaseStorage = storage;
         name = storage.getName();
-        changed = 0;
-        parent = _parent;
+        this.parent = parent;
         storeableClasses = columnTypes;
         transaction = new ThreadLocal<Transaction>() {
            @Override
@@ -357,13 +362,12 @@ public class DataBase implements Table {
         };
     }
 
-    public DataBase (Shell sl, File storage, TableProvider _parent) {
+    public DataBase(Shell sl, File storage, TableProvider parent) {
         map = new DataBaseMap();
         shell  = sl;
         dataBaseStorage = storage;
         name = storage.getName();
-        changed = 0;
-        parent = _parent;
+        this.parent = parent;
         transaction = new ThreadLocal<Transaction>() {
             @Override
             protected Transaction initialValue() {
@@ -378,15 +382,14 @@ public class DataBase implements Table {
         }
     }
 
-    public DataBase () {
+    public DataBase() {
         map = new DataBaseMap();
         shell  = new Shell();
         dataBaseStorage = new File (System.getProperty("fizteh.db.dir"));
         name = dataBaseStorage.getName();
-        changed = 0;
     }
 
-    public void load () throws IOException {
+    public void load() throws IOException {
         if (dataBaseStorage.isFile()) {
             loadDataBase(dataBaseStorage);
         } else {
@@ -394,11 +397,11 @@ public class DataBase implements Table {
         }
     }
 
-    public String getName () {
+    public String getName() {
         return name;
     }
 
-    public void initialize (GlobalFileMapState state) {
+    public void initialize(GlobalFileMapState state) {
         shell.addCommand(new Exit(state));
         shell.addCommand(new Put(state));
         shell.addCommand(new Get(state));
@@ -411,7 +414,7 @@ public class DataBase implements Table {
         }
     }
 
-    public void saveDataBase () throws IOException {
+    public void saveDataBase() throws IOException {
         if (dataBaseStorage.isFile()) {
             try {
                 saveToFile();
@@ -423,14 +426,14 @@ public class DataBase implements Table {
         }
     }
 
-    public Storeable get (String key) throws IllegalArgumentException {
+    public Storeable get(String key) throws IllegalArgumentException {
         if (key == null || (key.isEmpty() || key.trim().isEmpty())) {
             throw new IllegalArgumentException("Table name cannot be null");
         }
        return transaction.get().get(key);
     }
 
-    public Storeable put (String key, Storeable value) throws IllegalArgumentException {
+    public Storeable put(String key, Storeable value) throws IllegalArgumentException {
         if ((key == null) || (key.trim().isEmpty())) {
             throw new IllegalArgumentException("Key can not be null");
         }
@@ -464,7 +467,7 @@ public class DataBase implements Table {
         return transaction.get().size();
     }
 
-    public int commit () {
+    public int commit() {
 
         try {
             lock.lock();
@@ -481,7 +484,7 @@ public class DataBase implements Table {
         return 0;
     }
 
-    public int rollback () {
+    public int rollback() {
         int tempChanged = transaction.get().rollback();
         System.out.println(tempChanged);
         return tempChanged;

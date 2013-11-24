@@ -187,8 +187,8 @@ public class JSONTokener {
     public char next(char c) throws JSONException {
         char n = this.next();
         if (n != c) {
-            throw this.syntaxError("Expected '" + c + "' and instead saw '" +
-                    n + "'");
+            throw this.syntaxError("Expected '" + c + "' and instead saw '"
+                    + n + "'");
         }
         return n;
     }
@@ -228,7 +228,7 @@ public class JSONTokener {
      * @return  A character, or 0 if there are no more characters.
      */
     public char nextClean() throws JSONException {
-        for (;;) {
+        for (; ;) {
             char c = this.next();
             if (c == 0 || c > ' ') {
                 return c;
@@ -251,7 +251,7 @@ public class JSONTokener {
     public String nextString(char quote) throws JSONException {
         char c;
         StringBuffer sb = new StringBuffer();
-        for (;;) {
+        for (; ;) {
             c = this.next();
             switch (c) {
             case 0:
@@ -277,7 +277,7 @@ public class JSONTokener {
                     sb.append('\r');
                     break;
                 case 'u':
-                    sb.append((char)Integer.parseInt(this.next(4), 16));
+                    sb.append((char) Integer.parseInt(this.next(4), 16));
                     break;
                 case '"':
                 case '\'':
@@ -307,7 +307,7 @@ public class JSONTokener {
      */
     public String nextTo(char delimiter) throws JSONException {
         StringBuffer sb = new StringBuffer();
-        for (;;) {
+        for (; ;) {
             char c = this.next();
             if (c == delimiter || c == 0 || c == '\n' || c == '\r') {
                 if (c != 0) {
@@ -329,10 +329,10 @@ public class JSONTokener {
     public String nextTo(String delimiters) throws JSONException {
         char c;
         StringBuffer sb = new StringBuffer();
-        for (;;) {
+        for (; ;) {
             c = this.next();
-            if (delimiters.indexOf(c) >= 0 || c == 0 ||
-                    c == '\n' || c == '\r') {
+            if (delimiters.indexOf(c) >= 0 || c == 0
+                    || c == '\n' || c == '\r') {
                 if (c != 0) {
                     this.back();
                 }
@@ -364,6 +364,8 @@ public class JSONTokener {
             case '[':
                 this.back();
                 return new JSONArray(this);
+            default:
+                break;
         }
 
         /*
@@ -440,7 +442,7 @@ public class JSONTokener {
      * @return " at {index} [character {character} line {line}]"
      */
     public String toString() {
-        return " at " + this.index + " [character " + this.character + " line " +
-            this.line + "]";
+        return " at " + this.index + " [character " + this.character + " line "
+                + this.line + "]";
     }
 }

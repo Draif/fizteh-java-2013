@@ -106,7 +106,7 @@ public class JSONObject {
          *
          * @return NULL.
          */
-        protected final Object clone() {
+        protected Object clone() {
             return this;
         }
 
@@ -120,6 +120,10 @@ public class JSONObject {
          */
         public boolean equals(Object object) {
             return object == null || object == this;
+        }
+
+        public int hashCode() {
+            return 0;
         }
 
         /**

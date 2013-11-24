@@ -53,7 +53,7 @@ public class Element implements Storeable {
                 storage.set(columnIndex, value);
                 return;
             }
-            classChecker(columnIndex,value.getClass());
+            classChecker(columnIndex, value.getClass());
         }
         storage.set(columnIndex, value);
     }
@@ -65,12 +65,12 @@ public class Element implements Storeable {
         return storage.get(columnIndex);
     }
 
-    public Integer getIntAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException{
+    public Integer getIntAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
         if (!columnChecker(columnIndex)) {
             throw  new IndexOutOfBoundsException("getIntAt - wrong index!");
         }
         classChecker(columnIndex, Integer.class);
-        return (Integer)storage.get(columnIndex);
+        return (Integer) storage.get(columnIndex);
     }
 
     public Long getLongAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
@@ -78,7 +78,7 @@ public class Element implements Storeable {
             throw  new IndexOutOfBoundsException("getLongAt - wrong index!");
         }
         classChecker(columnIndex, Long.class);
-        return (Long)storage.get(columnIndex);
+        return (Long) storage.get(columnIndex);
     }
 
     public Byte getByteAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
@@ -86,7 +86,7 @@ public class Element implements Storeable {
             throw  new IndexOutOfBoundsException("getByteAt - wrong index!");
         }
         classChecker(columnIndex, Byte.class);
-        return (Byte)storage.get(columnIndex);
+        return (Byte) storage.get(columnIndex);
     }
 
     public Float getFloatAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
@@ -94,7 +94,7 @@ public class Element implements Storeable {
             throw  new IndexOutOfBoundsException("getFloatAt - wrong index!");
         }
         classChecker(columnIndex, Float.class);
-        return (Float)storage.get(columnIndex);
+        return (Float) storage.get(columnIndex);
     }
 
     public Double getDoubleAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
@@ -102,7 +102,7 @@ public class Element implements Storeable {
             throw  new IndexOutOfBoundsException("getDoubleAt - wrong index!");
         }
         classChecker(columnIndex, Double.class);
-        return (Double)storage.get(columnIndex);
+        return (Double) storage.get(columnIndex);
     }
 
     public Boolean getBooleanAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
@@ -110,7 +110,7 @@ public class Element implements Storeable {
             throw  new IndexOutOfBoundsException("getBooleanAt - wrong index!");
         }
         classChecker(columnIndex, Boolean.class);
-        return (Boolean)storage.get(columnIndex);
+        return (Boolean) storage.get(columnIndex);
     }
 
     public String getStringAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
@@ -118,12 +118,12 @@ public class Element implements Storeable {
             throw  new IndexOutOfBoundsException("getStringAt - wrong index!");
         }
         classChecker(columnIndex, String.class);
-        return (String)storage.get(columnIndex);
+        return (String) storage.get(columnIndex);
     }
 
     @Override
     public boolean equals(Object obj) {
-        Element row = (Element)obj;
+        Element row = (Element) obj;
         return row.storageClasses.equals(storageClasses) && row.storage.equals(storage);
     }
 
