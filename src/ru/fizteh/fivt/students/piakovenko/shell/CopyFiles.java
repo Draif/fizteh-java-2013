@@ -27,18 +27,18 @@ public class CopyFiles {
         }
     }
 
-    public static void copyRecursively (File from, File to) throws IOException {
-        if (from.isDirectory()){
+    public static void copyRecursively(File from, File to) throws IOException {
+        if (from.isDirectory()) {
             File fromNew = new File(to.getCanonicalPath(), from.getName());
-            if (!fromNew.mkdirs()){
+            if (!fromNew.mkdirs()) {
                 throw new IOException("Unable to create this directory - " + fromNew.getCanonicalPath());
             }
-            for (File f: from.listFiles()){
+            for (File f : from.listFiles()) {
                 copyRecursively(f, fromNew);
             }
             return;
         }
-        to = new File (to.getCanonicalPath() + File.separator + from.getName());
+        to = new File(to.getCanonicalPath() + File.separator + from.getName());
         if (!to.exists()) {
             to.createNewFile();
         }
@@ -58,7 +58,7 @@ public class CopyFiles {
         }
     }
 
-    private static void streamClose(Closeable s) throws IOException{
+    private static void streamClose(Closeable s) throws IOException {
         if (s != null) {
             s.close();
         }

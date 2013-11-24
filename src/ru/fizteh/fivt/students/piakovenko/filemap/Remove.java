@@ -16,13 +16,14 @@ public class Remove implements Commands {
     private final String name = "remove";
     private GlobalFileMapState db;
 
-    public Remove (GlobalFileMapState dataBase) {
+    public Remove(GlobalFileMapState dataBase) {
         db = dataBase;
     }
 
     public String getName() {
         return name;
     }
+
     public void perform(String[] args) throws IOException {
         if (!db.isValidTable()) {
             System.out.println("no table");

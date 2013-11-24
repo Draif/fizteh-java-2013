@@ -1,11 +1,7 @@
 package ru.fizteh.fivt.students.piakovenko.shell;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,7 +14,7 @@ public class CurrentStatus {
     private File currentDirectory;
 
     public CurrentStatus(File f) {
-        currentDirectory =  f;
+        currentDirectory = f;
     }
 
     public String getCurrentDirectory() throws IOException {
@@ -29,6 +25,7 @@ public class CurrentStatus {
     public File getCurrentFile() {
         return currentDirectory;
     }
+
     public void changeCurrentDirectory(String s) throws IOException {
         currentDirectory = new File(s);
     }

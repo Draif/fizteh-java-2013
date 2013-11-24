@@ -16,7 +16,7 @@ public class Commit implements Commands {
     private final String name = "commit";
     private GlobalFileMapState db = null;
 
-    public Commit (GlobalFileMapState t) {
+    public Commit(GlobalFileMapState t) {
         db = t;
     }
 

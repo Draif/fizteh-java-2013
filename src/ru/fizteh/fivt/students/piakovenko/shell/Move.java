@@ -29,7 +29,7 @@ public class Move implements Commands {
         Copy c = new Copy(currentStatus);
         Remove r = new Remove(currentStatus);
         String[] temp = new String[2];
-        for (int i =0; i < 2; ++i) {
+        for (int i = 0; i < 2; ++i) {
             temp[i] = array[i];
         }
         c.perform(array);

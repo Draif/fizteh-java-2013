@@ -26,6 +26,6 @@ public class Exit implements Commands {
         if (s.length != 1) {
             throw new IOException("Wrong arguments! Usage ~ exit");
         }
-       System.exit(0);
+        System.exit(0);
     }
 }

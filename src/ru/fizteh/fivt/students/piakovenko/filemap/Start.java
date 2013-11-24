@@ -1,11 +1,6 @@
 package ru.fizteh.fivt.students.piakovenko.filemap;
 
-import ru.fizteh.fivt.students.piakovenko.filemap.strings.DataBase;
 import ru.fizteh.fivt.students.piakovenko.filemap.strings.DataBasesFactory;
-import ru.fizteh.fivt.students.piakovenko.filemap.strings.DataBase;
-import ru.fizteh.fivt.students.piakovenko.shell.Shell;
-
-import java.io.File;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,7 +11,7 @@ import java.io.File;
  */
 
 public class Start {
-    public static int main (String[] args) {
+    public static int main(String[] args) {
         try {
             DataBasesFactory dbf = new DataBasesFactory();
             dbf.create(System.getProperty("fizteh.db.dir"));

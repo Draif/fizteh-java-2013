@@ -19,7 +19,7 @@ public class Exit implements Commands {
         return name;
     }
 
-    public Exit (GlobalFileMapState dataBase) {
+    public Exit(GlobalFileMapState dataBase) {
         db = dataBase;
     }
 

@@ -14,13 +14,13 @@ public class Remove implements Commands {
     private final String name = "rm";
     private CurrentStatus currentStatus;
 
-    public static void removeRecursively (File f) throws IOException{
+    public static void removeRecursively(File f) throws IOException {
         if (!f.isDirectory()) {
             if (!f.delete()) {
                 throw new IOException("Error! Unable to delete file - " + f.getCanonicalPath());
             }
         } else {
-            for (File file: f.listFiles()) {
+            for (File file : f.listFiles()) {
                 removeRecursively(file);
             }
             if (!f.delete()) {

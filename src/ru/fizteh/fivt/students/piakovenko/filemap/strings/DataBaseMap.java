@@ -14,7 +14,7 @@ public class DataBaseMap {
     private Map<String, String> map = new HashMap<String, String>(15);
     private Map<String, String> oldMap = new HashMap<String, String>(15);
 
-    public String put (String key, String value) {
+    public String put(String key, String value) {
         String oldValue = null;
         if (!map.containsKey(key)) {
             map.put(key, value);
@@ -40,7 +40,7 @@ public class DataBaseMap {
         return null;
     }
 
-    public String remove (String key) {
+    public String remove(String key) {
         if (!map.containsKey(key)) {
             System.out.println("not found");
         } else {
@@ -52,11 +52,11 @@ public class DataBaseMap {
         return null;
     }
 
-    public void primaryPut (String key, String value) {
-            map.put(key, value);
+    public void primaryPut(String key, String value) {
+        map.put(key, value);
     }
 
-    public Map<String, String> getMap () {
+    public Map<String, String> getMap() {
         return map;
     }
 

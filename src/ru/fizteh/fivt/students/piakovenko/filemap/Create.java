@@ -16,7 +16,7 @@ public class Create implements Commands {
     private final String name = "create";
     private GlobalFileMapState dbc = null;
 
-    public Create (GlobalFileMapState t) {
+    public Create(GlobalFileMapState t) {
         dbc = t;
     }
 

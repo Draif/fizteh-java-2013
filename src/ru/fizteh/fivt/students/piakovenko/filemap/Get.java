@@ -16,7 +16,7 @@ public class Get implements Commands {
     private final String name = "get";
     private GlobalFileMapState db;
 
-    public Get (GlobalFileMapState dataBase) {
+    public Get(GlobalFileMapState dataBase) {
         db = dataBase;
     }
 

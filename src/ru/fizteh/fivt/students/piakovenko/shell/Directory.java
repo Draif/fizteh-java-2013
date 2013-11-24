@@ -17,8 +17,8 @@ public class Directory implements Commands {
         currentStatus = cs;
     }
 
-    public void changeCurrentStatus (Object obj){
-        currentStatus = (CurrentStatus)obj;
+    public void changeCurrentStatus(Object obj) {
+        currentStatus = (CurrentStatus) obj;
     }
 
     public String getName() {
@@ -33,7 +33,7 @@ public class Directory implements Commands {
         if (!currentStatus.getCurrentFile().isDirectory()) {
             throw new IOException("Error! " + currentStatus.getCurrentDirectory() + " is not a directory!");
         }
-        for (String s: currentStatus.getCurrentFile().list()) {
+        for (String s : currentStatus.getCurrentFile().list()) {
             System.out.println(s);
         }
     }

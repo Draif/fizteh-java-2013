@@ -16,7 +16,7 @@ import java.io.File;
 public class DataBasesFactory implements TableProviderFactory {
     private Shell shell = null;
 
-    public TableProvider create (String dir) throws IllegalArgumentException {
+    public TableProvider create(String dir) throws IllegalArgumentException {
         if (dir == null || dir.trim().isEmpty()) {
             throw new IllegalArgumentException("Directory path is invalid");
         }
@@ -24,11 +24,14 @@ public class DataBasesFactory implements TableProviderFactory {
         if (fileMapStorage.isFile()) {
             throw new IllegalArgumentException("try create provider on file");
         }
+        if (!fileMapStorage.exists()) {
+            fileMapStorage.mkdir();
+        }
         shell = new Shell();
-        return new DataBasesCommander(shell,fileMapStorage);
+        return new DataBasesCommander(shell, fileMapStorage);
     }
 
-    public void start (String[] args) {
+    public void start(String[] args) {
         shell.start(args);
     }
 }

@@ -15,7 +15,7 @@ public class Rollback implements Commands {
     private final String name = "rollback";
     private GlobalFileMapState db;
 
-    public Rollback (GlobalFileMapState dataBase) {
+    public Rollback(GlobalFileMapState dataBase) {
         db = dataBase;
     }
 

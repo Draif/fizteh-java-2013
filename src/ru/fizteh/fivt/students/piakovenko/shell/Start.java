@@ -1,9 +1,5 @@
 package ru.fizteh.fivt.students.piakovenko.shell;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Scanner;
-
 /**
  * Created with IntelliJ IDEA.
  * User: Pavel

@@ -6,15 +6,13 @@ import ru.fizteh.fivt.students.piakovenko.filemap.Exit;
 import ru.fizteh.fivt.students.piakovenko.filemap.Get;
 import ru.fizteh.fivt.students.piakovenko.filemap.GlobalFileMapState;
 import ru.fizteh.fivt.students.piakovenko.filemap.Put;
-import ru.fizteh.fivt.students.piakovenko.shell.Shell;
 import ru.fizteh.fivt.students.piakovenko.shell.Remove;
+import ru.fizteh.fivt.students.piakovenko.shell.Shell;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
-import java.lang.Math;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,24 +30,30 @@ public class DataBase implements Table {
     private int changed;
 
     private boolean isValidNameDirectory(String name) {
-        if (name.length() < 5 || name.length() > 6)
+        if (name.length() < 5 || name.length() > 6) {
             return false;
+        }
         int number = Integer.parseInt(name.substring(0, name.indexOf('.')), 10);
-        if (number > 15 || number < 0)
+        if (number > 15 || number < 0) {
             return false;
-        if (!name.substring(name.indexOf('.') + 1).equals("dir"))
+        }
+        if (!name.substring(name.indexOf('.') + 1).equals("dir")) {
             return false;
+        }
         return true;
     }
 
     private boolean isValidNameFile(String name) {
-        if (name.length() < 5 || name.length() > 6)
+        if (name.length() < 5 || name.length() > 6) {
             return false;
+        }
         int number = Integer.parseInt(name.substring(0, name.indexOf('.')), 10);
-        if (number > 15 || number < 0)
+        if (number > 15 || number < 0) {
             return false;
-        if (!name.substring(name.indexOf('.') + 1).equals("dat"))
+        }
+        if (!name.substring(name.indexOf('.') + 1).equals("dat")) {
             return false;
+        }
         return true;
     }
 
@@ -296,28 +300,6 @@ public class DataBase implements Table {
             throw new IllegalArgumentException("key or value equals NULL");
         }
         String putValue = map.put(key, value);
-        /*if (putValue == null) {
-            if (!map.getRemovedMap().containsKey(key)) {
-                ++changed;
-            } else {
-                if (map.getRemovedMap().get(key).equals(value)) {
-                    --changed;
-                } else {
-                    ++changed;
-                }
-                map.getRemovedMap().remove(key);
-            }
-            map.getChangedMap().put(key, value);
-        } else {
-            if (!putValue.equals(value)) {
-                if (!map.getChangedMap().containsKey(key) && !map.getOverwriteMap().containsKey(key)) {
-                    ++changed;
-                }
-                if (!map.getOverwriteMap().containsKey(key)) {
-                    map.getOverwriteMap().put(key, value);
-                }
-            }
-        }  */
         return putValue;
     }
 
@@ -326,19 +308,6 @@ public class DataBase implements Table {
             throw new IllegalArgumentException("key equals null");
         }
         String removed = map.remove(key);
-        /*if (removed != null) {
-            if (!map.getRemovedMap().containsKey(key)) {
-                map.getRemovedMap().put(key, removed);
-            }
-            if (map.getChangedMap().containsKey(key)) {
-                map.getChangedMap().remove(key);
-                --changed;
-            } else if (map.getOverwriteMap().containsKey(key)){
-                map.getOverwriteMap().remove(key);
-            } else {
-                ++changed;
-            }
-        }     */
         return removed;
     }
 

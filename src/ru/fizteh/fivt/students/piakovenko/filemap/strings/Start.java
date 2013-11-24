@@ -1,10 +1,5 @@
 package ru.fizteh.fivt.students.piakovenko.filemap.strings;
 
-import ru.fizteh.fivt.students.piakovenko.filemap.strings.DataBase;
-import ru.fizteh.fivt.students.piakovenko.shell.Shell;
-
-import java.io.File;
-
 /**
  * Created with IntelliJ IDEA.
  * User: Pavel
@@ -14,7 +9,7 @@ import java.io.File;
  */
 
 public class Start {
-    public static void  main (String[] args) {
+    public static void main(String[] args) {
         try {
             DataBasesFactory dbf = new DataBasesFactory();
             try {

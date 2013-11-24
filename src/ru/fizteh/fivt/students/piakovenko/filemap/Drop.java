@@ -16,7 +16,7 @@ public class Drop implements Commands {
     private final String name = "drop";
     private GlobalFileMapState dbc = null;
 
-    public Drop (GlobalFileMapState t) {
+    public Drop(GlobalFileMapState t) {
         dbc = t;
     }
 

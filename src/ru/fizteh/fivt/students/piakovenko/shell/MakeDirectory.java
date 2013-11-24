@@ -32,7 +32,7 @@ public class MakeDirectory implements Commands {
         if (!f.isAbsolute()) {
             f = new File(currentStatus.getCurrentDirectory(), array[1]);
         }
-        if (!f.mkdirs()){
+        if (!f.mkdirs()) {
             throw new IOException("Unable to create this directory - " + f.getCanonicalPath());
         }
     }

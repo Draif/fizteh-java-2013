@@ -15,7 +15,7 @@ public class Size implements Commands {
     private final String name = "size";
     private GlobalFileMapState db;
 
-    public Size (GlobalFileMapState dataBase) {
+    public Size(GlobalFileMapState dataBase) {
         db = dataBase;
     }
 

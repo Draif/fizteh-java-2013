@@ -25,32 +25,33 @@ public class DataBasesCommander implements TableProvider {
     private GlobalFileMapState state = null;
     private static final String TABLE_NAME_FORMAT = "[A-Za-zА-Яа-я0-9]+";
 
-    private static File getMode (File directory) {
-        for (File f: directory.listFiles()) {
-            if (f.getName().equals("db.dat") && f.isFile())
+    private static File getMode(File directory) {
+        for (File f : directory.listFiles()) {
+            if (f.getName().equals("db.dat") && f.isFile()) {
                 return f;
+            }
         }
         return null;
     }
 
     private void fulfillFiles() {
-        for (File f: dataBaseDirectory.listFiles()){
+        for (File f : dataBaseDirectory.listFiles()) {
             filesMap.put(f.getName(), new DataBase(shell, f));
         }
     }
 
 
-    public DataBasesCommander () {
+    public DataBasesCommander() {
         shell = new Shell();
         dataBaseDirectory = new File(System.getProperty("fizteh.db.dir"));
         File modeFile = null;
-        if ((modeFile = getMode(dataBaseDirectory)) != null ) {
+        if ((modeFile = getMode(dataBaseDirectory)) != null) {
             currentDataBase = new DataBase(shell, modeFile);
-            state  = new GlobalFileMapState(currentDataBase, this);
+            state = new GlobalFileMapState(currentDataBase, this);
             currentDataBase.initialize(state);
             shell.changeInvitation("Database $ ");
         } else {
-            state  = new GlobalFileMapState(currentDataBase, this);
+            state = new GlobalFileMapState(currentDataBase, this);
             fulfillFiles();
             initialize(state);
             shell.changeInvitation("MultiFile Database $ ");
@@ -61,20 +62,20 @@ public class DataBasesCommander implements TableProvider {
         shell = s;
         dataBaseDirectory = storage;
         File modeFile = null;
-        if ((modeFile = getMode(storage)) != null ) {
+        if ((modeFile = getMode(storage)) != null) {
             currentDataBase = new DataBase(shell, modeFile);
-            state  = new GlobalFileMapState(currentDataBase, this);
+            state = new GlobalFileMapState(currentDataBase, this);
             currentDataBase.initialize(state);
             shell.changeInvitation("Database $ ");
         } else {
             fulfillFiles();
-            state  = new GlobalFileMapState(currentDataBase, this);
+            state = new GlobalFileMapState(currentDataBase, this);
             initialize(state);
             shell.changeInvitation("MultiFile Database $ ");
         }
     }
 
-    public void use (String dataBase) throws IOException {
+    public void use(String dataBase) throws IOException {
         if (filesMap.containsKey(dataBase)) {
             if (currentDataBase != null && currentDataBase.numberOfChanges() != 0) {
                 System.out.println(currentDataBase.numberOfChanges() + " unsaved changes");
@@ -83,7 +84,7 @@ public class DataBasesCommander implements TableProvider {
             if (filesMap.get(dataBase).equals(currentDataBase)) {
                 System.out.println("using " + dataBase);
                 return;
-            }  else if (currentDataBase != null) {
+            } else if (currentDataBase != null) {
                 currentDataBase.saveDataBase();
             }
             currentDataBase = filesMap.get(dataBase);
@@ -95,7 +96,7 @@ public class DataBasesCommander implements TableProvider {
         }
     }
 
-    public void removeTable (String dataBase) throws IllegalArgumentException {
+    public void removeTable(String dataBase) throws IllegalArgumentException {
         if (dataBase == null || dataBase.trim().equals("")) {
             throw new IllegalArgumentException("Null pointer to dataBase name");
         }
@@ -105,7 +106,8 @@ public class DataBasesCommander implements TableProvider {
                 state.changeTable(currentDataBase);
             }
             try {
-                ru.fizteh.fivt.students.piakovenko.shell.Remove.removeRecursively(filesMap.get(dataBase).returnFiledirectory());
+                ru.fizteh.fivt.students.piakovenko.shell.Remove.removeRecursively(
+                        filesMap.get(dataBase).returnFiledirectory());
             } catch (IOException e) {
                 System.err.println("Error! " + e.getMessage());
                 System.exit(1);
@@ -114,11 +116,11 @@ public class DataBasesCommander implements TableProvider {
             System.out.println("dropped");
         } else {
             System.out.println(dataBase + " not exists");
-            throw new IllegalStateException(dataBase +" not exists");
+            throw new IllegalStateException(dataBase + " not exists");
         }
     }
 
-    public Table createTable (String dataBase) throws IllegalArgumentException{
+    public Table createTable(String dataBase) throws IllegalArgumentException {
         if (dataBase == null || dataBase.trim().equals("")) {
             throw new IllegalArgumentException("Null pointer to name!");
         }
@@ -130,14 +132,14 @@ public class DataBasesCommander implements TableProvider {
         } else {
             File newFileMap = new File(dataBaseDirectory, dataBase);
             if (newFileMap.isFile()) {
-                throw  new IllegalArgumentException("try create table on file");
+                throw new IllegalArgumentException("try create table on file");
             }
-            if (!newFileMap.mkdirs()){
+            if (!newFileMap.mkdirs()) {
                 System.err.println("Unable to create this directory - " + dataBase);
                 System.exit(1);
             }
             System.out.println("created");
-            filesMap.put(dataBase, new DataBase(shell, newFileMap ));
+            filesMap.put(dataBase, new DataBase(shell, newFileMap));
             return filesMap.get(dataBase);
         }
         return null;

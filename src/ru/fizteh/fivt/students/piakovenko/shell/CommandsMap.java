@@ -15,18 +15,17 @@ public class CommandsMap {
     private Map<String, Commands> commands = new HashMap<String, Commands>();
 
     public void addCommand(Commands command) {
-        if (!commands.containsKey(command.getName())){
-             commands.put(command.getName(), command);
+        if (!commands.containsKey(command.getName())) {
+            commands.put(command.getName(), command);
         }
     }
-
 
 
     public void execute(String commandsString) throws IOException {
         String[] commandsArray = commandsString.trim().split("\\s*;\\s*");
         for (String command : commandsArray) {
             String[] args = command.split("\\s+");
-            if (commands.containsKey(args[0])){
+            if (commands.containsKey(args[0])) {
                 commands.get(args[0]).perform(args);
             } else {
                 throw new IOException("No command with such name: " + args[0]);
@@ -35,7 +34,7 @@ public class CommandsMap {
     }
 
 
-    public void removeCommand(String commandName) throws IOException{
+    public void removeCommand(String commandName) throws IOException {
         if (commands.containsKey(commandName)) {
             commands.remove(commandName);
         } else {

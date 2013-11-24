@@ -43,7 +43,7 @@ public class Shell {
     }
 
 
-    public Shell () {
+    public Shell() {
         cm = new CommandsMap();
     }
 
@@ -51,11 +51,11 @@ public class Shell {
         cm.addCommand(command);
     }
 
-    public void changeInvitation (String invitation) {
+    public void changeInvitation(String invitation) {
         startInvitation = invitation;
     }
 
-    public void initializeBasicCommands () {
+    public void initializeBasicCommands() {
         currentStatus = new CurrentStatus(new File("."));
         cm.addCommand(new PrintWorkingDirectory(currentStatus));
         cm.addCommand(new ChangeDirectory(currentStatus));
@@ -67,7 +67,7 @@ public class Shell {
         cm.addCommand(new Exit(currentStatus));
     }
 
-    public void initializeBasicCommands (CurrentStatus cs) {
+    public void initializeBasicCommands(CurrentStatus cs) {
         currentStatus = cs;
         cm.addCommand(new PrintWorkingDirectory(currentStatus));
         cm.addCommand(new ChangeDirectory(currentStatus));
@@ -79,18 +79,19 @@ public class Shell {
         cm.addCommand(new Exit(currentStatus));
     }
 
-    public void start (String[] args) {
+    public void start(String[] args) {
         if (args.length == 0) {
             interactiveMode();
         } else {
             packageMode(args);
         }
     }
-    public void executeCommand (String args) throws IOException{
+
+    public void executeCommand(String args) throws IOException {
         cm.execute(args);
     }
 
-    public void removeCommand (String commandName) throws IOException{
+    public void removeCommand(String commandName) throws IOException {
         cm.removeCommand(commandName);
     }
 
