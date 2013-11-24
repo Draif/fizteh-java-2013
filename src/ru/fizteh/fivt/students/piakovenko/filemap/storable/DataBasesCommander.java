@@ -36,35 +36,36 @@ public class DataBasesCommander implements TableProvider {
     private static final String TABLE_NAME_FORMAT = "[A-Za-zА-Яа-я0-9]+";
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
 
-    private static File getMode (File directory) {
+    private static File getMode(File directory) {
         for (File f: directory.listFiles()) {
-            if (f.getName().equals("db.dat") && f.isFile())
+            if (f.getName().equals("db.dat") && f.isFile()) {
                 return f;
+            }
         }
         return null;
     }
 
     private void fulfillFiles() {
-        for (File f: dataBaseDirectory.listFiles()){
+        for (File f: dataBaseDirectory.listFiles()) {
             filesMap.put(f.getName(), new DataBase(shell, f, this));
         }
     }
 
 
-    public DataBasesCommander () {
+    public DataBasesCommander() {
         shell = new Shell();
         dataBaseDirectory = new File(System.getProperty("fizteh.db.dir"));
         File modeFile = null;
-        if ((modeFile = getMode(dataBaseDirectory)) != null ) {
+        if ((modeFile = getMode(dataBaseDirectory)) != null) {
             currentDataBase = new DataBase(shell, modeFile, this);
             state  = new GlobalFileMapState(currentDataBase, this);
             currentDataBase.initialize(state);
-            shell.changeInvitation("Database $ ");
+            shell.changeInvitation(" $ ");
         } else {
             state  = new GlobalFileMapState(currentDataBase, this);
             fulfillFiles();
             initialize(state);
-            shell.changeInvitation("MultiFile Database $ ");
+            shell.changeInvitation(" $ ");
         }
     }
 
@@ -72,20 +73,20 @@ public class DataBasesCommander implements TableProvider {
         shell = s;
         dataBaseDirectory = storage;
         File modeFile = null;
-        if ((modeFile = getMode(storage)) != null ) {
+        if ((modeFile = getMode(storage)) != null) {
             currentDataBase = new DataBase(shell, modeFile, this);
             state  = new GlobalFileMapState(currentDataBase, this);
             currentDataBase.initialize(state);
-            shell.changeInvitation("Database $ ");
+            shell.changeInvitation(" $ ");
         } else {
             fulfillFiles();
             state  = new GlobalFileMapState(currentDataBase, this);
             initialize(state);
-            shell.changeInvitation("MultiFile Database $ ");
+            shell.changeInvitation(" $ ");
         }
     }
 
-    public void use (String dataBase) throws IOException {
+    public void use(String dataBase) throws IOException {
         if (filesMap.containsKey(dataBase)) {
             if (currentDataBase != null && currentDataBase.numberOfChanges() != 0) {
                 System.out.println(currentDataBase.numberOfChanges() + " unsaved changes");
@@ -107,7 +108,7 @@ public class DataBasesCommander implements TableProvider {
     }
 
     @Override
-    public void removeTable (String dataBase) throws IllegalArgumentException, IOException {
+    public void removeTable(String dataBase) throws IllegalArgumentException, IOException {
         if (dataBase == null || dataBase.trim().equals("")) {
             throw new IllegalArgumentException("Null pointer to dataBase name");
         }
@@ -119,7 +120,8 @@ public class DataBasesCommander implements TableProvider {
                     state.changeTable(currentDataBase);
                 }
                 try {
-                    ru.fizteh.fivt.students.piakovenko.shell.Remove.removeRecursively(filesMap.get(dataBase).returnFiledirectory());
+                    ru.fizteh.fivt.students.piakovenko.shell.Remove.removeRecursively(
+                            filesMap.get(dataBase).returnFiledirectory());
                 } catch (IOException e) {
                     System.err.println("Error! " + e.getMessage());
                     System.exit(1);
@@ -128,7 +130,7 @@ public class DataBasesCommander implements TableProvider {
                 System.out.println("dropped");
             } else {
                 System.out.println(dataBase + " not exists");
-                throw new IllegalStateException(dataBase +" not exists");
+                throw new IllegalStateException(dataBase + " not exists");
             }
         } finally {
             readWriteLock.writeLock().unlock();
@@ -136,7 +138,7 @@ public class DataBasesCommander implements TableProvider {
     }
 
     @Override
-    public Table createTable (String name, List<Class<?>> columnTypes) throws IOException, IllegalArgumentException {
+    public Table createTable(String name, List<Class<?>> columnTypes) throws IOException, IllegalArgumentException {
         if (name == null || name.trim().equals("")) {
             throw new IllegalArgumentException("Null pointer to name!");
         }
@@ -167,9 +169,9 @@ public class DataBasesCommander implements TableProvider {
             } else {
                 File newFileMap = new File(dataBaseDirectory, name);
                 if (newFileMap.isFile()) {
-                    throw  new IllegalArgumentException("try create table on file");
+                    throw new IllegalArgumentException("try create table on file");
                 }
-                if (!newFileMap.mkdirs()){
+                if (!newFileMap.mkdirs()) {
                     System.err.println("Unable to create this directory - " + name);
                     System.exit(1);
                 }
@@ -212,7 +214,7 @@ public class DataBasesCommander implements TableProvider {
     }
 
     public Storeable createFor(Table table) {
-        List <Class<?>> typesList = new ArrayList<Class<?>>();
+        List<Class<?>> typesList = new ArrayList<Class<?>>();
         for ( int i = 0; i < table.getColumnsCount(); ++i) {
             typesList.add(table.getColumnType(i));
         }
@@ -223,12 +225,12 @@ public class DataBasesCommander implements TableProvider {
         if (values.size() != table.getColumnsCount()) {
             throw new IndexOutOfBoundsException("Size of table and size of values are not equal!");
         }
-        List <Class<?>> typesList = new ArrayList<Class<?>>();
+        List<Class<?>> typesList = new ArrayList<Class<?>>();
         for ( int i = 0; i < table.getColumnsCount(); ++i) {
             typesList.add(table.getColumnType(i));
         }
         Storeable result = new Element(typesList);
-        for ( int i = 0; i < table.getColumnsCount(); ++i) {
+        for (int i = 0; i < table.getColumnsCount(); ++i) {
             result.setColumnAt(i, values.get(i));
         }
         return result;
