@@ -122,9 +122,14 @@ public class Element implements Storeable {
     }
 
     @Override
-    public boolean equals(Object obj) {
+     public boolean equals(Object obj) {
         Element row = (Element) obj;
         return row.storageClasses.equals(storageClasses) && row.storage.equals(storage);
+    }
+
+    @Override
+    public int hashCode() {
+        return 0;
     }
 
 }

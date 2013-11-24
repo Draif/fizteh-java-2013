@@ -20,7 +20,7 @@ public class DataBasesFactory implements TableProviderFactory {
     private Shell shell = null;
     private final ReadWriteLock lock = new ReentrantReadWriteLock(true);
 
-    public TableProvider create (String dir) throws IllegalArgumentException, IOException {
+    public TableProvider create(String dir) throws IllegalArgumentException, IOException {
         if (dir == null || dir.trim().isEmpty()) {
             throw new IllegalArgumentException("Directory path is invalid");
         }
@@ -38,10 +38,10 @@ public class DataBasesFactory implements TableProviderFactory {
         } finally {
             lock.writeLock().unlock();
         }
-        return new DataBasesCommander(shell,fileMapStorage);
+        return new DataBasesCommander(shell, fileMapStorage);
     }
 
-    public void start (String[] args) {
+    public void start(String[] args) {
         shell.start(args);
     }
 }

@@ -215,7 +215,7 @@ public class DataBasesCommander implements TableProvider {
 
     public Storeable createFor(Table table) {
         List<Class<?>> typesList = new ArrayList<Class<?>>();
-        for ( int i = 0; i < table.getColumnsCount(); ++i) {
+        for (int i = 0; i < table.getColumnsCount(); ++i) {
             typesList.add(table.getColumnType(i));
         }
         return new Element(typesList);
@@ -226,7 +226,7 @@ public class DataBasesCommander implements TableProvider {
             throw new IndexOutOfBoundsException("Size of table and size of values are not equal!");
         }
         List<Class<?>> typesList = new ArrayList<Class<?>>();
-        for ( int i = 0; i < table.getColumnsCount(); ++i) {
+        for (int i = 0; i < table.getColumnsCount(); ++i) {
             typesList.add(table.getColumnType(i));
         }
         Storeable result = new Element(typesList);

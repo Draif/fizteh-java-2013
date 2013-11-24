@@ -90,10 +90,10 @@ public class DataBaseMap {
         return count;
     }
 
-    public int currentSize(Map<String, Storeable> _newMap) {
+    public int currentSize(Map<String, Storeable> newMap) {
         int count = map.size();
-        for (final String key: _newMap.keySet()) {
-            Storeable newValue = _newMap.get(key);
+        for (final String key: newMap.keySet()) {
+            Storeable newValue = newMap.get(key);
             Storeable oldValue = map.get(key);
             if (newValue == null && oldValue != null) {
                 --count;
@@ -106,7 +106,7 @@ public class DataBaseMap {
 
     private boolean wasChanged(Storeable value1, Storeable value2) {
         boolean flag = false;
-        if (value1 == null && value2 == null){
+        if (value1 == null && value2 == null) {
             return false;
         } else if (value1 == null) {
             return true;
