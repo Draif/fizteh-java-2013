@@ -385,7 +385,7 @@ public class DataBase implements Table {
     public DataBase() {
         map = new DataBaseMap();
         shell  = new Shell();
-        dataBaseStorage = new File (System.getProperty("fizteh.db.dir"));
+        dataBaseStorage = new File(System.getProperty("fizteh.db.dir"));
         name = dataBaseStorage.getName();
     }
 
