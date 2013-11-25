@@ -36,17 +36,14 @@ public class DataBase implements Table {
     private File dataBaseStorage = null;
     private List<Class<?>> storeableClasses;
     private final String nameOfFileWithTypes = "signature.tsv";
-    private TableProvider parent = null;
     private ThreadLocal<Transaction> transaction;
     protected final Lock lock = new ReentrantLock(true);
 
     private class Transaction {
         private Map<String, Storeable> transactionMap = null;
-        private Map<String, Boolean> removedMap = null;
 
         public Transaction() {
             transactionMap = new HashMap<String, Storeable>();
-            removedMap = new HashMap<String, Boolean>();
         }
 
         public void put(String key, Storeable value) {
@@ -107,31 +104,11 @@ public class DataBase implements Table {
     }
 
     private boolean isValidNameDirectory(String name) {
-        if (name.length() < 5 || name.length() > 6) {
-            return false;
-        }
-        int number = Integer.parseInt(name.substring(0, name.indexOf('.')), 10);
-        if (number > 15 || number < 0) {
-            return false;
-        }
-        if (!name.substring(name.indexOf('.') + 1).equals("dir")) {
-            return false;
-        }
-        return true;
+        return Checker.isValidFileNumber(name);
     }
 
     private boolean isValidNameFile(String name) {
-        if (name.length() < 5 || name.length() > 6) {
-            return false;
-        }
-        int number = Integer.parseInt(name.substring(0, name.indexOf('.')), 10);
-        if (number > 15 || number < 0) {
-            return false;
-        }
-        if (!name.substring(name.indexOf('.') + 1).equals("dat")) {
-            return false;
-        }
-        return true;
+        return Checker.isValidFileNumber(name);
     }
 
     private int ruleNumberDirectory(String key) {
@@ -352,7 +329,6 @@ public class DataBase implements Table {
         shell  = sl;
         dataBaseStorage = storage;
         name = storage.getName();
-        this.parent = parent;
         storeableClasses = columnTypes;
         transaction = new ThreadLocal<Transaction>() {
            @Override
@@ -367,7 +343,6 @@ public class DataBase implements Table {
         shell  = sl;
         dataBaseStorage = storage;
         name = storage.getName();
-        this.parent = parent;
         transaction = new ThreadLocal<Transaction>() {
             @Override
             protected Transaction initialValue() {
@@ -382,12 +357,6 @@ public class DataBase implements Table {
         }
     }
 
-    public DataBase() {
-        map = new DataBaseMap();
-        shell  = new Shell();
-        dataBaseStorage = new File(System.getProperty("fizteh.db.dir"));
-        name = dataBaseStorage.getName();
-    }
 
     public void load() throws IOException {
         if (dataBaseStorage.isFile()) {
@@ -427,19 +396,13 @@ public class DataBase implements Table {
     }
 
     public Storeable get(String key) throws IllegalArgumentException {
-        if (key == null || (key.isEmpty() || key.trim().isEmpty())) {
-            throw new IllegalArgumentException("Table name cannot be null");
-        }
-       return transaction.get().get(key);
+        Checker.stringNotEmpty(key);
+        return transaction.get().get(key);
     }
 
     public Storeable put(String key, Storeable value) throws IllegalArgumentException {
-        if ((key == null) || (key.trim().isEmpty())) {
-            throw new IllegalArgumentException("Key can not be null");
-        }
-        if (key.matches("\\s*") || key.split("\\s+").length != 1) {
-            throw new IllegalArgumentException("Key contains whitespaces");
-        }
+        Checker.stringNotEmpty(key);
+        Checker.keyFormat(key);
         if (value == null) {
             throw new IllegalArgumentException("Value cannot be null");
         }
@@ -450,9 +413,7 @@ public class DataBase implements Table {
     }
 
     public Storeable remove(String key) throws IllegalArgumentException {
-        if (key == null || (key.isEmpty() || key.trim().isEmpty())) {
-            throw new IllegalArgumentException("Key name cannot be null");
-        }
+        Checker.stringNotEmpty(key);
         Storeable oldValue = transaction.get().get(key);
         transaction.get().put(key, null);
         return oldValue;

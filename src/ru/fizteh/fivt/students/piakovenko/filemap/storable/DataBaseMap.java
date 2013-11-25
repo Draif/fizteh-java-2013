@@ -105,7 +105,7 @@ public class DataBaseMap {
     }
 
     private boolean wasChanged(Storeable value1, Storeable value2) {
-        boolean flag = false;
+        boolean flag;
         if (value1 == null && value2 == null) {
             return false;
         } else if (value1 == null) {

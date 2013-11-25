@@ -8,7 +8,7 @@ package ru.fizteh.fivt.students.piakovenko.filemap.storable.JSON;
  */
 public class JSONException extends RuntimeException {
     private static final long serialVersionUID = 0;
-    private Throwable cause;
+    private final Throwable cause = null;
 
     /**
      * Constructs a JSONException with an explanatory message.
@@ -25,7 +25,7 @@ public class JSONException extends RuntimeException {
      */
     public JSONException(Throwable cause) {
         super(cause.getMessage());
-        this.cause = cause;
+        //this.cause = cause;
     }
 
     /**
