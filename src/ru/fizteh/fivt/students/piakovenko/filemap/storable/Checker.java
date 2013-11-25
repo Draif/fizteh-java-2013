@@ -13,7 +13,7 @@ public class Checker {
     private static final String TABLE_NAME_FORMAT = "[A-Za-zА-Яа-я0-9]+";
 
     public static void stringNotEmpty(String value) throws IllegalArgumentException {
-        if (value == null || value.trim().isEmpty() || value.isEmpty() ) {
+        if (value == null || value.trim().isEmpty() || value.isEmpty()) {
             throw new IllegalArgumentException("String is invalid");
         }
     }
@@ -24,7 +24,7 @@ public class Checker {
         }
     }
 
-    public static void checkColumnTypes (List<Class<?>> columnTypes) throws  IllegalArgumentException {
+    public static void checkColumnTypes(List<Class<?>> columnTypes) throws  IllegalArgumentException {
         if (columnTypes == null || columnTypes.isEmpty()) {
             throw new IllegalArgumentException("column types cannot be null");
         }
