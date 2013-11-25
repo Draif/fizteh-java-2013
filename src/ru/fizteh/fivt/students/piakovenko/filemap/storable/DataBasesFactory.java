@@ -26,11 +26,11 @@ public class DataBasesFactory implements TableProviderFactory {
         try {
             lock.writeLock().lock();
             fileMapStorage = new File(dir);
-            if (!fileMapStorage.exists()) {
-                throw new IOException("no such file!" + fileMapStorage.getCanonicalPath());
-            }
             if (fileMapStorage.isFile()) {
                 throw new IllegalArgumentException("try create provider on file");
+            }
+            if (!fileMapStorage.exists()) {
+                fileMapStorage.mkdir();
             }
             shell = new Shell();
         } finally {
