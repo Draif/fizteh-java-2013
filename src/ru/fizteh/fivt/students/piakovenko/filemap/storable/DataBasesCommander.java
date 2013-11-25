@@ -5,8 +5,6 @@ import ru.fizteh.fivt.storage.structured.Storeable;
 import ru.fizteh.fivt.storage.structured.Table;
 import ru.fizteh.fivt.storage.structured.TableProvider;
 import ru.fizteh.fivt.students.piakovenko.filemap.*;
-import ru.fizteh.fivt.students.piakovenko.filemap.storable.JSON.JSONArray;
-import ru.fizteh.fivt.students.piakovenko.filemap.storable.JSON.JSONException;
 import ru.fizteh.fivt.students.piakovenko.filemap.storable.JSON.JSONSerializer;
 import ru.fizteh.fivt.students.piakovenko.shell.Shell;
 
@@ -122,11 +120,6 @@ public class DataBasesCommander implements TableProvider {
     public Table createTable(String name, List<Class<?>> columnTypes) throws IOException, IllegalArgumentException {
         Checker.stringNotEmpty(name);
         Checker.correctTableName(name);
-        /*if (name.contains("\\") || name.contains("/") || name.contains(">") || name.contains("<")
-                || name.contains("\"") || name.contains(":") || name.contains("?") || name.contains("|")
-                || name.startsWith(".") || name.endsWith(".")) {
-            throw new RuntimeException("Bad symbols in tablename " + name);
-        }  */
         Checker.checkColumnTypes(columnTypes);
         try {
             readWriteLock.writeLock().lock();
