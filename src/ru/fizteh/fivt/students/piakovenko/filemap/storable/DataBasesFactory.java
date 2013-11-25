@@ -21,9 +21,7 @@ public class DataBasesFactory implements TableProviderFactory {
     private final ReadWriteLock lock = new ReentrantReadWriteLock(true);
 
     public TableProvider create(String dir) throws IllegalArgumentException, IOException {
-        if (dir == null || dir.trim().isEmpty()) {
-            throw new IllegalArgumentException("Directory path is invalid");
-        }
+        Checker.stringNotEmpty(dir);
         File fileMapStorage = null;
         try {
             lock.writeLock().lock();
