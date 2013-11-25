@@ -22,15 +22,17 @@ public class DataBasesFactory implements TableProviderFactory {
 
     public TableProvider create(String dir) throws IllegalArgumentException, IOException {
         Checker.stringNotEmpty(dir);
+        Checker.correctTableName(dir);
         File fileMapStorage = null;
         try {
             lock.writeLock().lock();
             fileMapStorage = new File(dir);
-            if (!fileMapStorage.exists()) {
-                throw new IOException("no such file!" + fileMapStorage.getCanonicalPath());
-            }
+
             if (fileMapStorage.isFile()) {
                 throw new IllegalArgumentException("try create provider on file");
+            }
+            if (!fileMapStorage.exists()) {
+                fileMapStorage.mkdir();
             }
             shell = new Shell();
         } finally {
