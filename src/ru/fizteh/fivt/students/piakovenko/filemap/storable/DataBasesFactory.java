@@ -14,12 +14,16 @@ import java.io.IOException;
  * Time: 23:58
  * To change this template use File | Settings | File Templates.
  */
-public class DataBasesFactory implements TableProviderFactory {
+public class DataBasesFactory implements TableProviderFactory, AutoCloseable {
     private Shell shell = null;
+    private boolean isValid = true;
 
-    public synchronized TableProvider create(String dir) throws IllegalArgumentException, IOException {
+    public synchronized TableProvider create(String dir) throws IllegalArgumentException, IOException, IllegalStateException {
+        if (!isValid) {
+            throw new IllegalStateException("TableFactory is invalid");
+        }
         Checker.stringNotEmpty(dir);
-        File fileMapStorage = null;
+        File fileMapStorage;
         fileMapStorage = new File(dir);
         if (fileMapStorage.isFile()) {
             throw new IllegalArgumentException("try create provider on file");
@@ -35,5 +39,10 @@ public class DataBasesFactory implements TableProviderFactory {
 
     public void start(String[] args) {
         shell.start(args);
+    }
+
+    @Override
+    public void close() {
+        isValid = false;
     }
 }

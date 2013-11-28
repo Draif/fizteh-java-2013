@@ -69,8 +69,7 @@ public class GlobalFileMapState {
 
     public void createTable(String name) throws IllegalArgumentException {
         if (isStoreableMode) {
-            throw new IllegalArgumentException("GFMS: createTable! Storeable mode is on! "
-                    + "This command can't work in this mode!");
+            //do nothing
         } else {
             tableProviderStrings.createTable(name);
         }
