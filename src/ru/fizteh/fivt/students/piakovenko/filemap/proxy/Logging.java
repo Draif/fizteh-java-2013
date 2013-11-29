@@ -1,6 +1,5 @@
 package ru.fizteh.fivt.students.piakovenko.filemap.proxy;
 
-import com.sun.deploy.net.proxy.ProxyHandler;
 import ru.fizteh.fivt.proxy.LoggingProxyFactory;
 
 import java.io.Writer;
