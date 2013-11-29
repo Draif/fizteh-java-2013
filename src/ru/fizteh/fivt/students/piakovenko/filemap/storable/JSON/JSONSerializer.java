@@ -6,6 +6,11 @@ import ru.fizteh.fivt.storage.structured.Table;
 import ru.fizteh.fivt.students.piakovenko.filemap.storable.Element;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+import org.json.JSONArray;
+import org.json.JSONException;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,7 +21,11 @@ import java.text.ParseException;
  */
 public class JSONSerializer {
     public static Storeable deserialize(Table table, String value) throws ParseException {
-        Storeable newStoreable = new Element();
+        List<Class<?>> columnTypes = new ArrayList<Class<?>>();
+        for (int i = 0; i < table.getColumnsCount(); ++i) {
+            columnTypes.add(table.getColumnType(i));
+        }
+        Storeable newStoreable = new Element(columnTypes);
         try {
             JSONArray json = new JSONArray(value);
             Object temp = null;

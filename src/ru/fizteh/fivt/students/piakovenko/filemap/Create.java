@@ -1,6 +1,6 @@
 package ru.fizteh.fivt.students.piakovenko.filemap;
 
-import ru.fizteh.fivt.students.piakovenko.filemap.storable.DataBasesCommander;
+
 import ru.fizteh.fivt.students.piakovenko.shell.Commands;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ public class Create implements Commands {
     private final String name = "create";
     private GlobalFileMapState dbc = null;
 
-    public Create (GlobalFileMapState t) {
+    public Create(GlobalFileMapState t) {
         dbc = t;
     }
 

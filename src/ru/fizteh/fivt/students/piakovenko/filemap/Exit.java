@@ -1,6 +1,5 @@
 package ru.fizteh.fivt.students.piakovenko.filemap;
 
-import ru.fizteh.fivt.students.piakovenko.filemap.storable.DataBase;
 import ru.fizteh.fivt.students.piakovenko.shell.Commands;
 
 import java.io.IOException;
@@ -20,7 +19,7 @@ public class Exit implements Commands {
         return name;
     }
 
-    public Exit (GlobalFileMapState dataBase) {
+    public Exit(GlobalFileMapState dataBase) {
         db = dataBase;
     }
 

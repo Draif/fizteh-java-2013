@@ -1,7 +1,6 @@
 package ru.fizteh.fivt.students.piakovenko.filemap;
 
 
-import ru.fizteh.fivt.students.piakovenko.filemap.storable.DataBase;
 import ru.fizteh.fivt.students.piakovenko.shell.Commands;
 
 import java.io.IOException;
@@ -17,13 +16,14 @@ public class Remove implements Commands {
     private final String name = "remove";
     private GlobalFileMapState db;
 
-    public Remove (GlobalFileMapState dataBase) {
+    public Remove(GlobalFileMapState dataBase) {
         db = dataBase;
     }
 
     public String getName() {
         return name;
     }
+
     public void perform(String[] args) throws IOException {
         if (!db.isValidTable()) {
             System.out.println("no table");

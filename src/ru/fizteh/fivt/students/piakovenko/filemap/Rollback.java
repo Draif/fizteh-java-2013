@@ -1,6 +1,5 @@
 package ru.fizteh.fivt.students.piakovenko.filemap;
 
-import ru.fizteh.fivt.students.piakovenko.filemap.storable.DataBase;
 import ru.fizteh.fivt.students.piakovenko.shell.Commands;
 
 import java.io.IOException;
@@ -16,7 +15,7 @@ public class Rollback implements Commands {
     private final String name = "rollback";
     private GlobalFileMapState db;
 
-    public Rollback (GlobalFileMapState dataBase) {
+    public Rollback(GlobalFileMapState dataBase) {
         db = dataBase;
     }
 

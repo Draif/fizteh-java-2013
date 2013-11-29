@@ -2,11 +2,8 @@ package ru.fizteh.fivt.students.piakovenko.filemap;
 
 import ru.fizteh.fivt.storage.strings.Table;
 import ru.fizteh.fivt.storage.strings.TableProvider;
-import ru.fizteh.fivt.storage.structured.Storeable;
-import ru.fizteh.fivt.students.piakovenko.filemap.storable.JSON.JSONSerializer;
 
 import java.io.IOException;
-import java.text.ParseException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,21 +22,21 @@ public class GlobalFileMapState {
     public GlobalFileMapState() {
     }
 
-    public GlobalFileMapState(Table _table, TableProvider _tableProvider) {
-        tableStrings = _table;
-        tableProviderStrings = _tableProvider;
+    public GlobalFileMapState(Table table, TableProvider tableProvider) {
+        tableStrings = table;
+        tableProviderStrings = tableProvider;
     }
 
-    public GlobalFileMapState(ru.fizteh.fivt.storage.structured.Table _table,
-                              ru.fizteh.fivt.storage.structured.TableProvider _tableProvider) {
-        tableStoreable = _table;
-        tableProviderStoreable = _tableProvider;
+    public GlobalFileMapState(ru.fizteh.fivt.storage.structured.Table table,
+                              ru.fizteh.fivt.storage.structured.TableProvider tableProvider) {
+        tableStoreable = table;
+        tableProviderStoreable = tableProvider;
         isStoreableMode = true;
     }
 
-    public boolean isValidTable(){
+    public boolean isValidTable() {
         if (isStoreableMode) {
-            if (tableStoreable == null){
+            if (tableStoreable == null) {
                 return false;
             }
         } else {
@@ -50,18 +47,18 @@ public class GlobalFileMapState {
         return true;
     }
 
-    public void changeTable(Table _table) throws IllegalArgumentException {
+    public void changeTable(Table table) throws IllegalArgumentException {
         if (isStoreableMode) {
-            throw  new IllegalArgumentException("GFMS: changeTable: Storeable mode is on!");
+            throw new IllegalArgumentException("GFMS: changeTable: Storeable mode is on!");
         }
-        tableStrings = _table;
+        tableStrings = table;
     }
 
-    public void changeTable(ru.fizteh.fivt.storage.structured.Table _table) {
+    public void changeTable(ru.fizteh.fivt.storage.structured.Table table) {
         if (!isStoreableMode) {
-            throw  new IllegalArgumentException("GFMS: changeTable: Storeable mode is off!");
+            throw new IllegalArgumentException("GFMS: changeTable: Storeable mode is off!");
         }
-        tableStoreable = _table;
+        tableStoreable = table;
     }
 
     public void commit() throws IOException {
@@ -72,15 +69,14 @@ public class GlobalFileMapState {
 
     public void createTable(String name) throws IllegalArgumentException {
         if (isStoreableMode) {
-            throw new IllegalArgumentException("GFMS: createTable! Storeable mode is on! " +
-                    "This command can't work in this mode!");
+            //do nothing
         } else {
             tableProviderStrings.createTable(name);
         }
     }
 
-    public void removeTable(String name) throws IOException{
-        if (isStoreableMode){
+    public void removeTable(String name) throws IOException {
+        if (isStoreableMode) {
             tableProviderStoreable.removeTable(name);
         } else {
             tableProviderStrings.removeTable(name);
@@ -103,21 +99,13 @@ public class GlobalFileMapState {
         }
     }
 
-    public void put (String key, String value) throws IOException{
-        if (isStoreableMode) {
-            Storeable putValue = null;
-            try {
-                putValue = JSONSerializer.deserialize(tableStoreable, value);
-            } catch (ParseException e) {
-                throw new IOException(e.getCause());
-            }
-            tableStoreable.put(key, putValue);
-        } else {
+    public void put(String key, String value) throws IOException {
+        if (!isStoreableMode) {
             tableStrings.put(key, value);
         }
     }
 
-    public void removeKey (String key) {
+    public void removeKey(String key) {
         if (isStoreableMode) {
             tableStoreable.remove(key);
         } else {
@@ -144,5 +132,4 @@ public class GlobalFileMapState {
     public void use(String name) throws IOException {
         throw new IOException("GFMS: use: Sorry, this method was depritiated!:(");
     }
-
 }
