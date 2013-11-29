@@ -21,7 +21,14 @@ public class ProxyHandlerImpl implements InvocationHandler {
         this.writer = writer;
     }
     @Override
-    public Object invoke(Object proxy, Method method, Object[] argumnets) {
-        return null;
+    public Object invoke(Object proxy, Method method, Object[] argumnets) throws Throwable {
+        Object result = null;
+        if (!method.getDeclaringClass().equals(Object.class)) {
+            XmlLogging logWriter = new XmlLogging(object, writer);
+            result = logWriter.printMethod(method, argumnets);
+        } else {
+            result = method.invoke(object, argumnets);
+        }
+        return result;
     }
 }

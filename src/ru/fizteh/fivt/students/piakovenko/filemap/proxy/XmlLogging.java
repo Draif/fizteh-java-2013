@@ -21,10 +21,10 @@ public class XmlLogging {
     private Object object = null;
     private XMLStreamWriter xmlWriter = null;
     StringWriter stringWriter = new StringWriter();
-    private IdentityHashMap<Object, Boolean> cycleLink= new IdentityHashMap<Object, Boolean>();
+    private IdentityHashMap<Object, Boolean> cycleLink = new IdentityHashMap<Object, Boolean>();
 
 
-    public XmlLogging (Object tempObject, Writer tempWriter) throws IOException {
+    public XmlLogging(Object tempObject, Writer tempWriter) throws IOException {
         this.writer = tempWriter;
         this.object = tempObject;
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
@@ -54,7 +54,7 @@ public class XmlLogging {
                         xmlWriter.writeEmptyElement("null");
                     } else if (temp instanceof Iterable) {
                         cycleLink.put(temp, true);
-                        PrintList((Iterable)temp);
+                        printList((Iterable) temp);
                     } else {
                         xmlWriter.writeCharacters(object.toString());
                     }
@@ -64,7 +64,7 @@ public class XmlLogging {
         }
     }
 
-    private void PrintList(Iterable list) throws XMLStreamException {
+    private void printList(Iterable list) throws XMLStreamException {
         xmlWriter.writeStartElement("list");
         for (final Object tempObject: list) {
             xmlWriter.writeStartElement("value");
@@ -74,7 +74,7 @@ public class XmlLogging {
                 xmlWriter.writeCharacters("cyclic");
             } else if (tempObject instanceof Iterable) {
                 cycleLink.put(tempObject, true);
-                PrintList((Iterable)tempObject);
+                printList((Iterable)tempObject);
             } else {
                 xmlWriter.writeCharacters(object.toString());
             }
@@ -89,11 +89,11 @@ public class XmlLogging {
             xmlWriter.writeEndElement();
     }
 
-    private void printReturnValue(Method method, Object[] arguments) throws IOException, XMLStreamException {
+    private Object printReturnValue(Method method, Object[] arguments) throws IOException, XMLStreamException {
         try {
             Object returnValue = method.invoke(arguments);
             if (returnValue instanceof Void) {
-                return;
+                return null;
             } else {
                 xmlWriter.writeStartElement("return");
                 if (returnValue ==null) {
@@ -103,19 +103,21 @@ public class XmlLogging {
                 }
                 xmlWriter.writeEndElement();
             }
+            return returnValue;
         } catch (XMLStreamException e) {
             throw e;
         } catch (Throwable e) {
             printException(e);
         }
-
+        return null;
     }
 
-    public void printMethod(Method method, Object[] arguments) throws IOException {
+    public Object printMethod(Method method, Object[] arguments) throws IOException {
         try {
             printMainInformation(method);
             printArguments(arguments);
-            printReturnValue(method, arguments);
+            Object temp = printReturnValue(method, arguments);
+            return temp;
         } catch (XMLStreamException e) {
             throw new IOException("Error in XML!");
         }
