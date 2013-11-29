@@ -22,9 +22,11 @@ public abstract class Logging implements LoggingProxyFactory {
             throw new IllegalArgumentException(interfaceClass.getName() + "is not interface");
         }
         if (!interfaceClass.isInstance(implementation)) {
-            throw new IllegalArgumentException(implementation.getClass() + "is not instance of " + interfaceClass.getName());
+            throw new IllegalArgumentException(implementation.getClass()
+                    + "is not instance of " + interfaceClass.getName());
         }
-        return Proxy.newProxyInstance(implementation.getClass().getClassLoader(),new Class[]{interfaceClass}, new ProxyHandlerImpl(implementation, writer));
+        return Proxy.newProxyInstance(implementation.getClass().getClassLoader(),new Class[]{interfaceClass},
+                new ProxyHandlerImpl(implementation, writer));
     }
 
 }
