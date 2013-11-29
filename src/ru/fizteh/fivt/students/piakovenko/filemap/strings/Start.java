@@ -9,7 +9,6 @@ package ru.fizteh.fivt.students.piakovenko.filemap.strings;
  */
 
 public class Start {
-
     public static void  main(String[] args) {
         try {
             DataBasesFactory dbf = new DataBasesFactory();
