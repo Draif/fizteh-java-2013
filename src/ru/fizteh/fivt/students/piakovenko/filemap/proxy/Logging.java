@@ -13,6 +13,10 @@ import java.lang.reflect.Proxy;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class Logging implements LoggingProxyFactory {
+
+    public Logging() {
+    }
+
     @Override
     public Object wrap(Writer writer, Object implementation, Class<?> interfaceClass) throws IllegalArgumentException {
         if (writer == null || implementation == null || interfaceClass == null) {
@@ -28,5 +32,4 @@ public abstract class Logging implements LoggingProxyFactory {
         return Proxy.newProxyInstance(implementation.getClass().getClassLoader(),new Class[]{interfaceClass},
                 new ProxyHandlerImpl(implementation, writer));
     }
-
 }
