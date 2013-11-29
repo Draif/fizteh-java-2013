@@ -67,14 +67,10 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
         }
     }
 
-<<<<<<< HEAD
-    public void use(String dataBase) throws IOException {
-=======
     public void use(String dataBase) throws IOException, IllegalStateException {
         if (!isValid) {
             throw new IllegalStateException("TableFactory is invalid");
         }
->>>>>>> Proxy
         if (filesMap.containsKey(dataBase)) {
             if (currentDataBase != null && currentDataBase.numberOfChanges() != 0) {
                 System.out.println(currentDataBase.numberOfChanges() + " unsaved changes");
@@ -96,14 +92,10 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
     }
 
     @Override
-<<<<<<< HEAD
-    public void removeTable(String dataBase) throws IllegalArgumentException, IOException {
-=======
     public void removeTable(String dataBase) throws IllegalArgumentException, IOException, IllegalStateException {
         if (!isValid) {
             throw new IllegalStateException("TableFactory is invalid");
         }
->>>>>>> Proxy
         if (dataBase == null || dataBase.trim().equals("")) {
             throw new IllegalArgumentException("Null pointer to dataBase name");
         }
@@ -133,14 +125,10 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
     }
 
     @Override
-<<<<<<< HEAD
-    public Table createTable(String name, List<Class<?>> columnTypes) throws IOException, IllegalArgumentException {
-=======
     public Table createTable(String name, List<Class<?>> columnTypes) throws IOException, IllegalArgumentException, IllegalStateException {
         if (!isValid) {
             throw new IllegalStateException("TableFactory is invalid");
         }
->>>>>>> Proxy
         Checker.stringNotEmpty(name);
         Checker.correctTableName(name);
         Checker.checkColumnTypes(columnTypes);
@@ -153,14 +141,12 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
                 if (newFileMap.isFile()) {
                     throw new IllegalArgumentException("try create table on file");
                 }
-<<<<<<< HEAD
                 if (!newFileMap.mkdirs()) {
                     System.err.println("Unable to create this directory - " + name);
                     System.exit(1);
                 }
                 System.out.println("created");
                 filesMap.put(name, new DataBase(shell, newFileMap, this, columnTypes));
-=======
                 if (!newFileMap.exists()) {
                     if (!newFileMap.mkdirs()) {
                         System.err.println("Unable to create this directory - " + name);
@@ -170,7 +156,6 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
                 System.out.println("created");
                 filesMap.put(name, new DataBase(shell, newFileMap, this, columnTypes));
                 statesMap.put(name, new StateOfDataBase());
->>>>>>> Proxy
                 return filesMap.get(name);
             }
             return null;
@@ -180,22 +165,16 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
     }
 
     @Override
-<<<<<<< HEAD
-    public Table getTable(String name) throws IllegalArgumentException {
-=======
     public Table getTable(String name) throws IllegalArgumentException, IllegalStateException {
         if (!isValid) {
             throw new IllegalStateException("TableFactory is invalid");
         }
->>>>>>> Proxy
         Checker.stringNotEmpty(name);
         Checker.correctTableName(name);
         try {
             readWriteLock.readLock().lock();
             if (filesMap.containsKey(name)) {
-<<<<<<< HEAD
                 return filesMap.get(name);
-=======
                 if (statesMap.get(name).check()) {
                     return filesMap.get(name);
                 } else {
@@ -207,7 +186,6 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
                     statesMap.put(name, new StateOfDataBase());
                     return filesMap.get(name);
                 }
->>>>>>> Proxy
             } else {
                 return null;
             }
@@ -227,14 +205,10 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
         return JSONSerializer.serialize(table, value);
     }
 
-<<<<<<< HEAD
-    public Storeable createFor(Table table) {
-=======
     public Storeable createFor(Table table) throws IllegalStateException {
         if (!isValid) {
             throw new IllegalStateException("TableFactory is invalid");
         }
->>>>>>> Proxy
         List<Class<?>> typesList = new ArrayList<Class<?>>();
         for (int i = 0; i < table.getColumnsCount(); ++i) {
             typesList.add(table.getColumnType(i));
@@ -242,14 +216,10 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
         return new Element(typesList);
     }
 
-<<<<<<< HEAD
-    public Storeable createFor(Table table, List<?> values) throws ColumnFormatException, IndexOutOfBoundsException {
-=======
     public Storeable createFor(Table table, List<?> values) throws ColumnFormatException, IndexOutOfBoundsException, IllegalStateException {
         if (!isValid) {
             throw new IllegalStateException("TableFactory is invalid");
         }
->>>>>>> Proxy
         Checker.equalSizes(values.size(), table.getColumnsCount());
         List<Class<?>> typesList = new ArrayList<Class<?>>();
         for (int i = 0; i < table.getColumnsCount(); ++i) {

@@ -70,10 +70,6 @@ public class DataBase implements Table, AutoCloseable {
             return count;
         }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> Proxy
         public void clearMap() {
             newMap.clear();
         }
@@ -338,20 +334,13 @@ public class DataBase implements Table, AutoCloseable {
         }
     }
 
-<<<<<<< HEAD
-    public DataBase(Shell sl, File storage, TableProvider parent, List<Class<?>> columnTypes) {
-=======
     public DataBase(Shell sl, File storage, DataBasesCommander parent, List<Class<?>> columnTypes) {
->>>>>>> Proxy
         map = new HashMap<String, Storeable>();
         shell  = sl;
         dataBaseStorage = storage;
         name = storage.getName();
         storeableClasses = columnTypes;
-<<<<<<< HEAD
-=======
         this.parent = parent;
->>>>>>> Proxy
         transaction = new ThreadLocal<Transaction>() {
            @Override
            protected Transaction initialValue() {
@@ -360,14 +349,9 @@ public class DataBase implements Table, AutoCloseable {
         };
     }
 
-<<<<<<< HEAD
-    public DataBase(Shell sl, File storage, TableProvider parent) {
-        map = new HashMap<String, Storeable>();
-=======
     public DataBase(Shell sl, File storage, DataBasesCommander parent) {
         map = new HashMap<String, Storeable>();
         this.parent = parent;
->>>>>>> Proxy
         shell  = sl;
         dataBaseStorage = storage;
         name = storage.getName();
@@ -388,14 +372,10 @@ public class DataBase implements Table, AutoCloseable {
         }
     }
 
-<<<<<<< HEAD
-    public String getName() {
-=======
     public String getName() throws IllegalStateException {
         if (!parent.isDataBaseValid(name)) {
             throw new IllegalStateException("this method was closed!");
         }
->>>>>>> Proxy
         return name;
     }
 
@@ -424,14 +404,10 @@ public class DataBase implements Table, AutoCloseable {
         }
     }
 
-<<<<<<< HEAD
-    public Storeable get(String key) throws IllegalArgumentException {
-=======
     public Storeable get(String key) throws IllegalArgumentException, IllegalStateException {
         if (!parent.isDataBaseValid(name)) {
             throw new IllegalStateException("this method was closed!");
         }
->>>>>>> Proxy
         try {
             readWriteLock.readLock().lock();
             Checker.stringNotEmpty(key);
@@ -441,14 +417,10 @@ public class DataBase implements Table, AutoCloseable {
         }
     }
 
-<<<<<<< HEAD
-    public Storeable put(String key, Storeable value) throws IllegalArgumentException {
-=======
     public Storeable put(String key, Storeable value) throws IllegalArgumentException, IllegalStateException {
         if (!parent.isDataBaseValid(name)) {
             throw new IllegalStateException("this method was closed!");
         }
->>>>>>> Proxy
         try {
             readWriteLock.writeLock().lock();
             Checker.stringNotEmpty(key);
@@ -465,14 +437,10 @@ public class DataBase implements Table, AutoCloseable {
         }
     }
 
-<<<<<<< HEAD
-    public Storeable remove(String key) throws IllegalArgumentException {
-=======
     public Storeable remove(String key) throws IllegalArgumentException, IllegalStateException {
         if (!parent.isDataBaseValid(name)) {
             throw new IllegalStateException("this method was closed!");
         }
->>>>>>> Proxy
         try {
             readWriteLock.writeLock().lock();
             Checker.stringNotEmpty(key);
@@ -489,14 +457,10 @@ public class DataBase implements Table, AutoCloseable {
         return dataBaseStorage;
     }
 
-<<<<<<< HEAD
-    public int size() {
-=======
     public int size() throws IllegalStateException {
         if (!parent.isDataBaseValid(name)) {
             throw new IllegalStateException("this method was closed!");
         }
->>>>>>> Proxy
         try {
             lock.lock();
             System.out.println(transaction.get().transactionGetSize());
@@ -506,14 +470,10 @@ public class DataBase implements Table, AutoCloseable {
         }
     }
 
-<<<<<<< HEAD
-    public int commit() {
-=======
     public int commit() throws IllegalStateException {
         if (!parent.isDataBaseValid(name)) {
             throw new IllegalStateException("this method was closed!");
         }
->>>>>>> Proxy
         try {
             lock.lock();
             int changesCount = transaction.get().commit();
@@ -524,14 +484,10 @@ public class DataBase implements Table, AutoCloseable {
         }
     }
 
-<<<<<<< HEAD
-    public int rollback() {
-=======
     public int rollback() throws IllegalStateException {
         if (!parent.isDataBaseValid(name)) {
             throw new IllegalStateException("this method was closed!");
         }
->>>>>>> Proxy
         try {
             lock.lock();
             int count = transaction.get().calcChanges();
