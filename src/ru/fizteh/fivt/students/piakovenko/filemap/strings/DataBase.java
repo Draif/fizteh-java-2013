@@ -1,7 +1,10 @@
 package ru.fizteh.fivt.students.piakovenko.filemap.strings;
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> Proxy
 import ru.fizteh.fivt.storage.structured.ColumnFormatException;
 import ru.fizteh.fivt.storage.structured.Storeable;
 import ru.fizteh.fivt.storage.structured.Table;
@@ -331,7 +334,6 @@ public class DataBase implements Table, AutoCloseable {
             readFromDirectory(f, numberOfDirectory);
         }
     }
-
 
     public DataBase(Shell sl, File storage, DataBasesCommander parent, List<Class<?>> columnTypes) {
         map = new HashMap<String, Storeable>();
