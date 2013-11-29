@@ -1,7 +1,5 @@
 package ru.fizteh.fivt.students.piakovenko.filemap.proxy;
 
-import com.sun.deploy.net.proxy.ProxyHandler;
-
 import java.io.Writer;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
