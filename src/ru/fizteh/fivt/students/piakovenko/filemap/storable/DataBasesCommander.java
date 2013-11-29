@@ -141,12 +141,6 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
                 if (newFileMap.isFile()) {
                     throw new IllegalArgumentException("try create table on file");
                 }
-                if (!newFileMap.mkdirs()) {
-                    System.err.println("Unable to create this directory - " + name);
-                    System.exit(1);
-                }
-                System.out.println("created");
-                filesMap.put(name, new DataBase(shell, newFileMap, this, columnTypes));
                 if (!newFileMap.exists()) {
                     if (!newFileMap.mkdirs()) {
                         System.err.println("Unable to create this directory - " + name);
@@ -174,7 +168,6 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
         try {
             readWriteLock.readLock().lock();
             if (filesMap.containsKey(name)) {
-                return filesMap.get(name);
                 if (statesMap.get(name).check()) {
                     return filesMap.get(name);
                 } else {
