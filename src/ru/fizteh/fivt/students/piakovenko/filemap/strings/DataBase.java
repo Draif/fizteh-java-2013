@@ -1,145 +1,60 @@
 package ru.fizteh.fivt.students.piakovenko.filemap.strings;
 
 
-import ru.fizteh.fivt.storage.structured.ColumnFormatException;
-import ru.fizteh.fivt.storage.structured.Storeable;
-import ru.fizteh.fivt.storage.structured.Table;
-import ru.fizteh.fivt.storage.structured.TableProvider;
+import ru.fizteh.fivt.storage.strings.Table;
 import ru.fizteh.fivt.students.piakovenko.filemap.Exit;
 import ru.fizteh.fivt.students.piakovenko.filemap.Get;
 import ru.fizteh.fivt.students.piakovenko.filemap.GlobalFileMapState;
 import ru.fizteh.fivt.students.piakovenko.filemap.Put;
 import ru.fizteh.fivt.students.piakovenko.shell.Remove;
 import ru.fizteh.fivt.students.piakovenko.shell.Shell;
-import java.io.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
-import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-
-public class DataBase implements Table, AutoCloseable {
+/**
+ * Created with IntelliJ IDEA.
+ * User: Pavel
+ * Date: 12.10.13
+ * Time: 22:45
+ * To change this template use File | Settings | File Templates.
+ */
+public class DataBase implements Table {
     private String name;
     private RandomAccessFile raDataBaseFile = null;
-    private Map<String, Storeable> map = null;
+    private DataBaseMap map = null;
     private Shell shell = null;
     private File dataBaseStorage = null;
-    private List<Class<?>> storeableClasses;
-    private ThreadLocal<Transaction> transaction;
-    private DataBasesCommander parent = null;
-    protected final Lock lock = new ReentrantLock(true);
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
-
-    private class Transaction {
-        private Map<String, Storeable> newMap;
-
-        public Transaction() {
-            this.newMap = new HashMap<String, Storeable>();
-        }
-
-        public void put(String key, Storeable value) {
-            newMap.put(key, value);
-        }
-
-        public Storeable get(String key) {
-            if (newMap.containsKey(key)) {
-                return newMap.get(key);
-            }
-            return map.get(key);
-        }
-
-        public int commit() {
-            int count = 0;
-            for (String key : newMap.keySet()) {
-                Storeable value = newMap.get(key);
-                if (isChanged(value, map.get(key))) {
-                    if (value == null) {
-                        map.remove(key);
-                    } else {
-                        map.put(key, value);
-                    }
-                    ++count;
-                }
-            }
-            return count;
-        }
-
-        public void clearMap() {
-            newMap.clear();
-        }
-
-        public int transactionGetSize() {
-            return map.size() + calcSize();
-        }
-
-        public int calcChanges() {
-            int count = 0;
-            for (final String key : newMap.keySet()) {
-                Storeable newKey = newMap.get(key);
-                if (isChanged(newKey, map.get(key))) {
-                    ++count;
-                }
-            }
-            return count;
-        }
-
-        private int calcSize() {
-            int count = 0;
-            for (final String key : newMap.keySet()) {
-                Storeable newValue = newMap.get(key);
-                Storeable oldValue = map.get(key);
-                if (newValue == null && oldValue != null) {
-                    --count;
-                } else if (newValue != null && oldValue == null) {
-                    ++count;
-                }
-            }
-            return count;
-        }
-
-        private boolean isChanged(Storeable oldValue, Storeable newValue) {
-            if (newValue == null && oldValue == null) {
-                return false;
-            }
-            if (newValue == null || oldValue == null) {
-                return true;
-            }
-            return !oldValue.equals(newValue);
-        }
-
-    }
-
-    public void checkAlienStoreable(Storeable storeable) {
-        for (int index = 0; index < getColumnsCount(); ++index) {
-            try {
-                Object o = storeable.getColumnAt(index);
-                if (o == null) {
-                    continue;
-                }
-                if (!o.getClass().equals(getColumnType(index))) {
-                    throw new ColumnFormatException("Alien storeable with incompatible types");
-                }
-            } catch (IndexOutOfBoundsException e) {
-                throw new ColumnFormatException("Alien storeable with less columns");
-            }
-        }
-        try {
-            storeable.getColumnAt(getColumnsCount());
-        } catch (IndexOutOfBoundsException e) {
-            return;
-        }
-        throw new ColumnFormatException("Alien storeable with more columns");
-    }
+    private int changed;
 
     private boolean isValidNameDirectory(String name) {
-        return Checker.isValidFileNumber(name);
+        if (name.length() < 5 || name.length() > 6) {
+            return false;
+        }
+        int number = Integer.parseInt(name.substring(0, name.indexOf('.')), 10);
+        if (number > 15 || number < 0) {
+            return false;
+        }
+        if (!name.substring(name.indexOf('.') + 1).equals("dir")) {
+            return false;
+        }
+        return true;
     }
 
     private boolean isValidNameFile(String name) {
-        return Checker.isValidFileNumber(name);
+        if (name.length() < 5 || name.length() > 6) {
+            return false;
+        }
+        int number = Integer.parseInt(name.substring(0, name.indexOf('.')), 10);
+        if (number > 15 || number < 0) {
+            return false;
+        }
+        if (!name.substring(name.indexOf('.') + 1).equals("dat")) {
+            return false;
+        }
+        return true;
     }
 
     private int ruleNumberDirectory(String key) {
@@ -181,13 +96,7 @@ public class DataBase implements Table, AutoCloseable {
             } else {
                 length -= l2;
             }
-            try {
-                map.put(new String(key, StandardCharsets.UTF_8), JSONSerializer.deserialize(
-                        this, new String(value, StandardCharsets.UTF_8)));
-            } catch (ParseException e) {
-                System.err.println("readFromFile: problem with desereliaze" + e.getMessage());
-                System.exit(1);
-            }
+            map.primaryPut(new String(key, StandardCharsets.UTF_8), new String(value, StandardCharsets.UTF_8));
         }
     }
 
@@ -229,12 +138,7 @@ public class DataBase implements Table, AutoCloseable {
                 if (ruleNumberFile(keyString) != numberOfFile || ruleNumberDirectory(keyString) != numberOfDirectory) {
                     throw new IOException("Wrong place of key value! Key: " + keyString + " Value: " + valueString);
                 } else {
-                    try {
-                        map.put(keyString, JSONSerializer.deserialize(this, valueString));
-                    } catch (ParseException e) {
-                        System.err.println("readFromFile: problem with deserializer" + e.getMessage());
-                        System.exit(1);
-                    }
+                    map.primaryPut(keyString, valueString);
                 }
             }
         } catch (IOException e) {
@@ -248,11 +152,11 @@ public class DataBase implements Table, AutoCloseable {
     }
 
     private void saveToFile() throws IOException {
-        long length  = 0;
+        long length = 0;
         raDataBaseFile.seek(0);
-        for (String key: map.keySet()) {
-            byte [] keyBytes = key.getBytes(StandardCharsets.UTF_8);
-            byte [] valueBytes = JSONSerializer.serialize(this, map.get(key)).getBytes(StandardCharsets.UTF_8);
+        for (String key : map.getMap().keySet()) {
+            byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+            byte[] valueBytes = map.getMap().get(key).getBytes(StandardCharsets.UTF_8);
             raDataBaseFile.writeInt(keyBytes.length);
             raDataBaseFile.writeInt(valueBytes.length);
             raDataBaseFile.write(keyBytes);
@@ -285,7 +189,7 @@ public class DataBase implements Table, AutoCloseable {
         if (!dataBaseStorage.mkdirs()) {
             throw new IOException("Unable to create this directory - " + dataBaseStorage.getCanonicalPath());
         }
-        for (String key : map.keySet()) {
+        for (String key : map.getMap().keySet()) {
             Integer numberOfDirectory = ruleNumberDirectory(key);
             Integer numberOfFile = ruleNumberFile(key);
             File directory = new File(dataBaseStorage, numberOfDirectory.toString() + ".dir");
@@ -298,7 +202,7 @@ public class DataBase implements Table, AutoCloseable {
             if (!writeFile.exists()) {
                 writeFile.createNewFile();
             }
-            saveToFile(writeFile, key, JSONSerializer.serialize(this, map.get(key)));
+            saveToFile(writeFile, key, map.getMap().get(key));
         }
     }
 
@@ -331,35 +235,21 @@ public class DataBase implements Table, AutoCloseable {
         }
     }
 
-    public DataBase(Shell sl, File storage, DataBasesCommander parent, List<Class<?>> columnTypes) {
-        map = new HashMap<String, Storeable>();
-        shell  = sl;
+    public DataBase(Shell sl, File storage) {
+        map = new DataBaseMap();
+        shell = sl;
         dataBaseStorage = storage;
         name = storage.getName();
-        storeableClasses = columnTypes;
-        this.parent = parent;
-        transaction = new ThreadLocal<Transaction>() {
-           @Override
-           protected Transaction initialValue() {
-            return new Transaction();
-           }
-        };
+        changed = 0;
     }
 
-    public DataBase(Shell sl, File storage, DataBasesCommander parent) {
-        map = new HashMap<String, Storeable>();
-        this.parent = parent;
-        shell  = sl;
-        dataBaseStorage = storage;
-        name = storage.getName();
-        transaction = new ThreadLocal<Transaction>() {
-            @Override
-            protected Transaction initialValue() {
-                return new Transaction();
-            }
-        };
+    public DataBase() {
+        map = new DataBaseMap();
+        shell = new Shell();
+        dataBaseStorage = new File(System.getProperty("fizteh.db.dir"));
+        name = dataBaseStorage.getName();
+        changed = 0;
     }
-
 
     public void load() throws IOException {
         if (dataBaseStorage.isFile()) {
@@ -369,11 +259,7 @@ public class DataBase implements Table, AutoCloseable {
         }
     }
 
-
-    public String getName() throws IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
+    public String getName() {
         return name;
     }
 
@@ -402,140 +288,54 @@ public class DataBase implements Table, AutoCloseable {
         }
     }
 
-    public Storeable get(String key) throws IllegalArgumentException, IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
+    public String get(String key) throws IllegalArgumentException {
+        if (key == null) {
+            throw new IllegalArgumentException("key equals NULL");
         }
-        try {
-            readWriteLock.readLock().lock();
-            Checker.stringNotEmpty(key);
-            return transaction.get().get(key);
-        } finally {
-            readWriteLock.readLock().unlock();
-        }
+        return map.get(key);
     }
 
-    public Storeable put(String key, Storeable value) throws IllegalArgumentException, IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
+    public String put(String key, String value) throws IllegalArgumentException {
+        if (key == null || value == null || key.trim().equals("") || value.trim().equals("")) {
+            throw new IllegalArgumentException("key or value equals NULL");
         }
-        try {
-            readWriteLock.writeLock().lock();
-            Checker.stringNotEmpty(key);
-            Checker.keyFormat(key);
-            if (value == null) {
-                throw new IllegalArgumentException("Value cannot be null");
-            }
-            checkAlienStoreable(value);
-            Storeable oldValue = transaction.get().get(key);
-            transaction.get().put(key, value);
-            return oldValue;
-        } finally {
-            readWriteLock.writeLock().unlock();
-        }
+        String putValue = map.put(key, value);
+        return putValue;
     }
 
-    public Storeable remove(String key) throws IllegalArgumentException, IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
+    public String remove(String key) throws IllegalArgumentException {
+        if (key == null) {
+            throw new IllegalArgumentException("key equals null");
         }
-        try {
-            readWriteLock.writeLock().lock();
-            Checker.stringNotEmpty(key);
-            Storeable oldValue = transaction.get().get(key);
-            transaction.get().put(key, null);
-            transaction.get().calcChanges();
-            return oldValue;
-        } finally {
-            readWriteLock.writeLock().unlock();
-        }
+        String removed = map.remove(key);
+        return removed;
     }
 
     public File returnFiledirectory() {
         return dataBaseStorage;
     }
 
-    public int size() throws IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
-        try {
-            lock.lock();
-            System.out.println(transaction.get().transactionGetSize());
-            return transaction.get().transactionGetSize();
-        } finally {
-            lock.unlock();
-        }
+    public int size() {
+        System.out.println(map.getMap().size());
+        return map.getMap().size();
     }
 
-    public int commit() throws IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
-        try {
-            lock.lock();
-            int changesCount = transaction.get().commit();
-            transaction.get().clearMap();
-            return changesCount;
-        } finally {
-            lock.unlock();
-        }
+    public int commit() {
+        int tempChanged = map.changed();
+        map.commit();
+        System.out.println(tempChanged);
+        return tempChanged;
     }
 
-    public int rollback() throws IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
-        try {
-            lock.lock();
-            int count = transaction.get().calcChanges();
-            transaction.get().clearMap();
-            return count;
-        } finally {
-            lock.unlock();
-        }
+    public int rollback() {
+        int tempChanged = map.changed();
+        map.getMap().clear();
+        map.rollback();
+        System.out.println(tempChanged);
+        return tempChanged;
     }
 
-    public int getColumnsCount() throws IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
-        return storeableClasses.size();
-    }
     public int numberOfChanges() {
-        return transaction.get().calcChanges();
+        return changed;
     }
-
-    public Class<?> getColumnType(int columnIndex) throws IndexOutOfBoundsException, IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
-        return storeableClasses.get(columnIndex);
-    }
-
-    public List<Class<?>> storableClasses() {
-        return storeableClasses;
-    }
-
-    @Override
-    public String toString() throws IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
-        String storage = null;
-        try {
-            storage = dataBaseStorage.getCanonicalPath();
-        } catch (IOException e) {
-            System.err.println("Error with Database.toString()");
-            System.exit(1432);
-        }
-        return this.getClass().getSimpleName() + "[" + storage + "]";
-    }
-
-    @Override
-    public void close() {
-        rollback();
-        parent.changeDataBaseState(name, false);
-    }
-
 }
