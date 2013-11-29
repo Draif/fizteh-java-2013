@@ -1,10 +1,6 @@
 package ru.fizteh.fivt.students.piakovenko.filemap.strings;
 
-<<<<<<< HEAD
 
-
-=======
->>>>>>> Proxy
 import ru.fizteh.fivt.storage.structured.ColumnFormatException;
 import ru.fizteh.fivt.storage.structured.Storeable;
 import ru.fizteh.fivt.storage.structured.Table;
@@ -405,7 +401,6 @@ public class DataBase implements Table, AutoCloseable {
             saveToDirectory();
         }
     }
-
 
     public Storeable get(String key) throws IllegalArgumentException, IllegalStateException {
         if (!parent.isDataBaseValid(name)) {

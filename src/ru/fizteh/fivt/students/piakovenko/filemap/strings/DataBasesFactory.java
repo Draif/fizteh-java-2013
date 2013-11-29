@@ -18,7 +18,6 @@ public class DataBasesFactory implements TableProviderFactory, AutoCloseable {
     private boolean isValid = true;
 
 
-
     public synchronized TableProvider create(String dir) throws IllegalArgumentException, IOException, IllegalStateException {
         if (!isValid) {
             throw new IllegalStateException("TableFactory is invalid");
