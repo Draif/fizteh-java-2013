@@ -24,15 +24,15 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
-public class DataBase implements Table {
+public class DataBase implements Table, AutoCloseable {
     private String name;
     private RandomAccessFile raDataBaseFile = null;
     private Map<String, Storeable> map = null;
     private Shell shell = null;
     private File dataBaseStorage = null;
     private List<Class<?>> storeableClasses;
-    private final String nameOfFileWithTypes = "signature.tsv";
     private ThreadLocal<Transaction> transaction;
+    private DataBasesCommander parent = null;
     protected final Lock lock = new ReentrantLock(true);
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
 
@@ -70,7 +70,10 @@ public class DataBase implements Table {
             return count;
         }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> Proxy
         public void clearMap() {
             newMap.clear();
         }
@@ -335,12 +338,20 @@ public class DataBase implements Table {
         }
     }
 
+<<<<<<< HEAD
     public DataBase(Shell sl, File storage, TableProvider parent, List<Class<?>> columnTypes) {
+=======
+    public DataBase(Shell sl, File storage, DataBasesCommander parent, List<Class<?>> columnTypes) {
+>>>>>>> Proxy
         map = new HashMap<String, Storeable>();
         shell  = sl;
         dataBaseStorage = storage;
         name = storage.getName();
         storeableClasses = columnTypes;
+<<<<<<< HEAD
+=======
+        this.parent = parent;
+>>>>>>> Proxy
         transaction = new ThreadLocal<Transaction>() {
            @Override
            protected Transaction initialValue() {
@@ -349,8 +360,14 @@ public class DataBase implements Table {
         };
     }
 
+<<<<<<< HEAD
     public DataBase(Shell sl, File storage, TableProvider parent) {
         map = new HashMap<String, Storeable>();
+=======
+    public DataBase(Shell sl, File storage, DataBasesCommander parent) {
+        map = new HashMap<String, Storeable>();
+        this.parent = parent;
+>>>>>>> Proxy
         shell  = sl;
         dataBaseStorage = storage;
         name = storage.getName();
@@ -371,7 +388,14 @@ public class DataBase implements Table {
         }
     }
 
+<<<<<<< HEAD
     public String getName() {
+=======
+    public String getName() throws IllegalStateException {
+        if (!parent.isDataBaseValid(name)) {
+            throw new IllegalStateException("this method was closed!");
+        }
+>>>>>>> Proxy
         return name;
     }
 
@@ -400,7 +424,14 @@ public class DataBase implements Table {
         }
     }
 
+<<<<<<< HEAD
     public Storeable get(String key) throws IllegalArgumentException {
+=======
+    public Storeable get(String key) throws IllegalArgumentException, IllegalStateException {
+        if (!parent.isDataBaseValid(name)) {
+            throw new IllegalStateException("this method was closed!");
+        }
+>>>>>>> Proxy
         try {
             readWriteLock.readLock().lock();
             Checker.stringNotEmpty(key);
@@ -410,7 +441,14 @@ public class DataBase implements Table {
         }
     }
 
+<<<<<<< HEAD
     public Storeable put(String key, Storeable value) throws IllegalArgumentException {
+=======
+    public Storeable put(String key, Storeable value) throws IllegalArgumentException, IllegalStateException {
+        if (!parent.isDataBaseValid(name)) {
+            throw new IllegalStateException("this method was closed!");
+        }
+>>>>>>> Proxy
         try {
             readWriteLock.writeLock().lock();
             Checker.stringNotEmpty(key);
@@ -427,7 +465,14 @@ public class DataBase implements Table {
         }
     }
 
+<<<<<<< HEAD
     public Storeable remove(String key) throws IllegalArgumentException {
+=======
+    public Storeable remove(String key) throws IllegalArgumentException, IllegalStateException {
+        if (!parent.isDataBaseValid(name)) {
+            throw new IllegalStateException("this method was closed!");
+        }
+>>>>>>> Proxy
         try {
             readWriteLock.writeLock().lock();
             Checker.stringNotEmpty(key);
@@ -444,7 +489,14 @@ public class DataBase implements Table {
         return dataBaseStorage;
     }
 
+<<<<<<< HEAD
     public int size() {
+=======
+    public int size() throws IllegalStateException {
+        if (!parent.isDataBaseValid(name)) {
+            throw new IllegalStateException("this method was closed!");
+        }
+>>>>>>> Proxy
         try {
             lock.lock();
             System.out.println(transaction.get().transactionGetSize());
@@ -454,7 +506,14 @@ public class DataBase implements Table {
         }
     }
 
+<<<<<<< HEAD
     public int commit() {
+=======
+    public int commit() throws IllegalStateException {
+        if (!parent.isDataBaseValid(name)) {
+            throw new IllegalStateException("this method was closed!");
+        }
+>>>>>>> Proxy
         try {
             lock.lock();
             int changesCount = transaction.get().commit();
@@ -465,7 +524,14 @@ public class DataBase implements Table {
         }
     }
 
+<<<<<<< HEAD
     public int rollback() {
+=======
+    public int rollback() throws IllegalStateException {
+        if (!parent.isDataBaseValid(name)) {
+            throw new IllegalStateException("this method was closed!");
+        }
+>>>>>>> Proxy
         try {
             lock.lock();
             int count = transaction.get().calcChanges();
@@ -476,15 +542,46 @@ public class DataBase implements Table {
         }
     }
 
-    public int getColumnsCount() {
+    public int getColumnsCount() throws IllegalStateException {
+        if (!parent.isDataBaseValid(name)) {
+            throw new IllegalStateException("this method was closed!");
+        }
         return storeableClasses.size();
     }
     public int numberOfChanges() {
         return transaction.get().calcChanges();
     }
 
-    public Class<?> getColumnType(int columnIndex) throws IndexOutOfBoundsException {
+    public Class<?> getColumnType(int columnIndex) throws IndexOutOfBoundsException, IllegalStateException {
+        if (!parent.isDataBaseValid(name)) {
+            throw new IllegalStateException("this method was closed!");
+        }
         return storeableClasses.get(columnIndex);
+    }
+
+    public List<Class<?>> storableClasses() {
+        return storeableClasses;
+    }
+
+    @Override
+    public String toString() throws IllegalStateException {
+        if (!parent.isDataBaseValid(name)) {
+            throw new IllegalStateException("this method was closed!");
+        }
+        String storage = null;
+        try {
+            storage = dataBaseStorage.getCanonicalPath();
+        } catch (IOException e) {
+            System.err.println("Error with Database.toString()");
+            System.exit(1432);
+        }
+        return this.getClass().getSimpleName() + "[" + storage + "]";
+    }
+
+    @Override
+    public void close() {
+        rollback();
+        parent.changeDataBaseState(name, false);
     }
 
 }

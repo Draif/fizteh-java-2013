@@ -11,6 +11,7 @@ package ru.fizteh.fivt.students.piakovenko.filemap.storable;
 import ru.fizteh.fivt.storage.structured.ColumnFormatException;
 import ru.fizteh.fivt.storage.structured.Storeable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -130,6 +131,23 @@ public class Element implements Storeable {
     @Override
     public int hashCode() {
         return 0;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getClass().getSimpleName());
+        sb.append("[");
+        for (int i = 0; i < storage.size(); ++i) {
+            if (storage.get(i).toString() != null) {
+                sb.append(storage.get(i).toString());
+            }
+            if (i != storage.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
 }
