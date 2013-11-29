@@ -12,7 +12,7 @@ import java.lang.reflect.Proxy;
  * Time: 0:00
  * To change this template use File | Settings | File Templates.
  */
-public abstract class Logging implements LoggingProxyFactory {
+public class Logging implements LoggingProxyFactory {
 
     public Logging() {
     }
@@ -29,7 +29,7 @@ public abstract class Logging implements LoggingProxyFactory {
             throw new IllegalArgumentException(implementation.getClass()
                     + "is not instance of " + interfaceClass.getName());
         }
-        return Proxy.newProxyInstance(implementation.getClass().getClassLoader(),new Class[]{interfaceClass},
+        return Proxy.newProxyInstance(implementation.getClass().getClassLoader(), new Class[]{interfaceClass},
                 new ProxyHandlerImpl(implementation, writer));
     }
 }
