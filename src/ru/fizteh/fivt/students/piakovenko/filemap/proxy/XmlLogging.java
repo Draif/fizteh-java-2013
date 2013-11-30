@@ -85,6 +85,8 @@ public class XmlLogging {
             xmlWriter.writeCharacters("");
             if (arguments != null) {
                 printArguments(arguments);
+            } else {
+                xmlWriter.writeEmptyElement("arguments");
             }
             if (exception == null) {
                 if (!method.getReturnType().toString().equals("void")) {
