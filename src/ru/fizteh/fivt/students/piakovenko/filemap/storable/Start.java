@@ -12,7 +12,7 @@ import java.io.IOException;
 
 public class Start {
     public static void  main(String[] args) {
-        /*try {
+        try {
             DataBasesFactory dbf = new DataBasesFactory();
             try {
                 dbf.create(System.getProperty("fizteh.db.dir"));
@@ -27,6 +27,6 @@ public class Start {
         } catch (IllegalArgumentException e) {
             System.err.println("Error! " + e.getMessage());
             System.exit(1);
-        } */
+        }
     }
 }
