@@ -5,7 +5,6 @@ package ru.fizteh.fivt.students.piakovenko.filemap.storable;
 import ru.fizteh.fivt.storage.structured.ColumnFormatException;
 import ru.fizteh.fivt.storage.structured.Storeable;
 import ru.fizteh.fivt.storage.structured.Table;
-import ru.fizteh.fivt.storage.structured.TableProvider;
 import ru.fizteh.fivt.students.piakovenko.filemap.Exit;
 import ru.fizteh.fivt.students.piakovenko.filemap.Get;
 import ru.fizteh.fivt.students.piakovenko.filemap.GlobalFileMapState;
@@ -517,7 +516,7 @@ public class DataBase implements Table, AutoCloseable {
     }
 
     @Override
-    synchronized public void close() {
+    public synchronized void close() {
         rollback();
         stateOfDataBase.change(false);
     }

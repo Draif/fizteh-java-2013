@@ -122,16 +122,15 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
     }
 
     @Override
-    public Table createTable(String name, List<Class<?>> columnTypes) throws IOException, IllegalArgumentException, IllegalStateException {
+    public Table createTable(String name, List<Class<?>> columnTypes)
+            throws IOException, IllegalArgumentException, IllegalStateException {
         stateOfDataBase.check();
         Checker.stringNotEmpty(name);
         Checker.correctTableName(name);
         Checker.checkColumnTypes(columnTypes);
         try {
             readWriteLock.writeLock().lock();
-            if (filesMap.containsKey(name)) {
-               // System.out.println(name + " exists");
-            } else {
+            if (!filesMap.containsKey(name)) {
                 File newFileMap = new File(dataBaseDirectory, name);
                 if (newFileMap.isFile()) {
                     throw new IllegalArgumentException("try create table on file");
@@ -142,11 +141,9 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
                         System.exit(1);
                     }
                 }
-                //System.out.println("created");
                 filesMap.put(name, new DataBase(shell, newFileMap, this, columnTypes));
-                return filesMap.get(name);
             }
-            return null;
+            return filesMap.get(name);
         } finally {
             readWriteLock.writeLock().unlock();
         }
@@ -166,7 +163,7 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
                     List<Class<?>> temp = filesMap.get(name).storableClasses();
                     File tempFileStorage = filesMap.get(name).returnFiledirectory();
                     filesMap.remove(name);
-                    filesMap.put(name, new DataBase(shell,tempFileStorage, this, temp));
+                    filesMap.put(name, new DataBase(shell, tempFileStorage, this, temp));
                     return filesMap.get(name);
                 }
             } else {
@@ -195,7 +192,8 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
         return new Element(typesList);
     }
 
-    public Storeable createFor(Table table, List<?> values) throws ColumnFormatException, IndexOutOfBoundsException, IllegalStateException {
+    public Storeable createFor(Table table, List<?> values)
+            throws ColumnFormatException, IndexOutOfBoundsException, IllegalStateException {
         stateOfDataBase.check();
         Checker.equalSizes(values.size(), table.getColumnsCount());
         List<Class<?>> typesList = new ArrayList<Class<?>>();
@@ -234,7 +232,7 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
     }
 
     @Override
-    synchronized public void close() {
+    public synchronized void close() {
         for (final DataBase temp: filesMap.values()) {
             temp.close();
         }
