@@ -2,6 +2,7 @@ package ru.fizteh.fivt.students.piakovenko.filemap.proxy;
 
 import java.io.Writer;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -24,10 +25,24 @@ public class ProxyHandlerImpl implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] argumnets) throws Throwable {
         Object result = null;
         if (!method.getDeclaringClass().equals(Object.class)) {
-            XmlLogging logWriter = new XmlLogging(object, writer);
-            result = logWriter.printMethod(method, argumnets);
+            XmlLogging logWriter = new XmlLogging(writer);
+            logWriter.printMainInformation(object, method);
+            logWriter.printArguments(argumnets);
+            try {
+                result = method.invoke(argumnets);
+                if (!(result instanceof Void)) {
+                    logWriter.printReturnValue(result);
+                }
+            } catch (InvocationTargetException e) {
+                logWriter.printException(e);
+                throw e.getTargetException();
+            }
         } else {
-            result = method.invoke(object, argumnets);
+            try {
+                result = method.invoke(argumnets);
+            } catch (InvocationTargetException e) {
+                throw e.getTargetException();
+            }
         }
         return result;
     }
