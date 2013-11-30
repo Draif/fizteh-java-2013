@@ -46,7 +46,7 @@ public class XmlLogging {
             xmlWriter.writeAttribute("class", object.getClass().getName());
             xmlWriter.writeAttribute("name", method.getName());
         } catch (XMLStreamException e) {
-            throw new IOException(e.getNestedException());
+            throw new IOException("Error in XML " +  e.getMessage());
         }
     }
 
@@ -151,6 +151,7 @@ public class XmlLogging {
         try {
             xmlWriter.writeEndElement();
             writer.write(xmlWriter.toString() + "\n");
+            writer.flush();
         } catch (XMLStreamException e) {
             throw new IOException("error while closing: " + e.getMessage());
         }
