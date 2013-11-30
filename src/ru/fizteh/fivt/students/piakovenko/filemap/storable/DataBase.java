@@ -35,6 +35,7 @@ public class DataBase implements Table, AutoCloseable {
     private DataBasesCommander parent = null;
     protected final Lock lock = new ReentrantLock(true);
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
+    private StateOfDataBase stateOfDataBase = new StateOfDataBase();
 
     private class Transaction {
         private Map<String, Storeable> newMap;
@@ -373,9 +374,7 @@ public class DataBase implements Table, AutoCloseable {
     }
 
     public String getName() throws IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
+        stateOfDataBase.check();
         return name;
     }
 
@@ -405,9 +404,7 @@ public class DataBase implements Table, AutoCloseable {
     }
 
     public Storeable get(String key) throws IllegalArgumentException, IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
+        stateOfDataBase.check();
         try {
             readWriteLock.readLock().lock();
             Checker.stringNotEmpty(key);
@@ -418,9 +415,7 @@ public class DataBase implements Table, AutoCloseable {
     }
 
     public Storeable put(String key, Storeable value) throws IllegalArgumentException, IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
+        stateOfDataBase.check();
         try {
             readWriteLock.writeLock().lock();
             Checker.stringNotEmpty(key);
@@ -438,9 +433,7 @@ public class DataBase implements Table, AutoCloseable {
     }
 
     public Storeable remove(String key) throws IllegalArgumentException, IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
+        stateOfDataBase.check();
         try {
             readWriteLock.writeLock().lock();
             Checker.stringNotEmpty(key);
@@ -458,9 +451,7 @@ public class DataBase implements Table, AutoCloseable {
     }
 
     public int size() throws IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
+        stateOfDataBase.check();
         try {
             lock.lock();
             System.out.println(transaction.get().transactionGetSize());
@@ -471,9 +462,7 @@ public class DataBase implements Table, AutoCloseable {
     }
 
     public int commit() throws IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
+        stateOfDataBase.check();
         try {
             lock.lock();
             int changesCount = transaction.get().commit();
@@ -485,9 +474,7 @@ public class DataBase implements Table, AutoCloseable {
     }
 
     public int rollback() throws IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
+        stateOfDataBase.check();
         try {
             lock.lock();
             int count = transaction.get().calcChanges();
@@ -499,9 +486,7 @@ public class DataBase implements Table, AutoCloseable {
     }
 
     public int getColumnsCount() throws IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
+        stateOfDataBase.check();
         return storeableClasses.size();
     }
     public int numberOfChanges() {
@@ -509,35 +494,32 @@ public class DataBase implements Table, AutoCloseable {
     }
 
     public Class<?> getColumnType(int columnIndex) throws IndexOutOfBoundsException, IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
+        stateOfDataBase.check();
         return storeableClasses.get(columnIndex);
     }
 
     public List<Class<?>> storableClasses() {
         return storeableClasses;
     }
-
-    @Override
-    public String toString() throws IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
-        String storage = null;
+    public boolean checkForClose() {
         try {
-            storage = dataBaseStorage.getCanonicalPath();
-        } catch (IOException e) {
-            System.err.println("Error with Database.toString()");
-            System.exit(1432);
+            stateOfDataBase.check();
+            return false;
+        } catch (IllegalStateException e) {
+            return true;
         }
-        return this.getClass().getSimpleName() + "[" + storage + "]";
     }
 
     @Override
-    public void close() {
+    public String toString() throws IllegalStateException {
+        stateOfDataBase.check();
+        return this.getClass().getSimpleName() + "[" + parent.fullTablePath(name) + "]";
+    }
+
+    @Override
+    synchronized public void close() {
         rollback();
-        parent.changeDataBaseState(name, false);
+        stateOfDataBase.change(false);
     }
 
 }

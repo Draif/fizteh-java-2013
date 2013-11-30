@@ -6,6 +6,8 @@ import ru.fizteh.fivt.students.piakovenko.shell.Shell;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,12 +18,11 @@ import java.io.IOException;
  */
 public class DataBasesFactory implements TableProviderFactory, AutoCloseable {
     private Shell shell = null;
-    private boolean isValid = true;
+    private StateOfDataBase stateOfDataBase = new StateOfDataBase();
+    private Map<String, DataBasesCommander> commanders = new HashMap<String, DataBasesCommander>();
 
     public synchronized TableProvider create(String dir) throws IllegalArgumentException, IOException, IllegalStateException {
-        if (!isValid) {
-            throw new IllegalStateException("TableFactory is invalid");
-        }
+        stateOfDataBase.check();
         Checker.stringNotEmpty(dir);
         File fileMapStorage;
         fileMapStorage = new File(dir);
@@ -34,7 +35,8 @@ public class DataBasesFactory implements TableProviderFactory, AutoCloseable {
             }
         }
         shell = new Shell();
-        return new DataBasesCommander(shell, fileMapStorage);
+        commanders.put(dir, new DataBasesCommander(shell, fileMapStorage, dir));
+        return commanders.get(dir);
     }
 
     public void start(String[] args) {
@@ -42,7 +44,10 @@ public class DataBasesFactory implements TableProviderFactory, AutoCloseable {
     }
 
     @Override
-    public void close() {
-        isValid = false;
+    synchronized public void close() {
+        for (final DataBasesCommander temp: commanders.values()) {
+            temp.close();
+        }
+        stateOfDataBase.change(false);
     }
 }
