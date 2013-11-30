@@ -1,5 +1,7 @@
 package ru.fizteh.fivt.students.piakovenko.filemap.proxy;
 
+import ru.fizteh.fivt.common.Exceptions;
+
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -7,10 +9,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,16 +19,11 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 public class XmlLogging {
-    private Writer writer = null;
-    //private Object object = null;
     private XMLStreamWriter xmlWriter = null;
     StringWriter stringWriter = new StringWriter();
-    private final Set<Object> containedArguments = Collections.newSetFromMap(new IdentityHashMap<Object, Boolean>());
     private IdentityHashMap<Object, Boolean> cycleLink = new IdentityHashMap<Object, Boolean>();
 
-
-    public XmlLogging(Writer tempWriter) throws IOException {
-        this.writer = tempWriter;
+    public XmlLogging() throws IOException {
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
         try {
             xmlWriter = factory.createXMLStreamWriter(stringWriter);
@@ -37,123 +31,82 @@ public class XmlLogging {
             throw new IOException("error with print Mehod" + e.getMessage());
         }
     }
+    public void printObject(Object object) throws Exception {
+        if (object == null) {
+            xmlWriter.writeEmptyElement("null");
+        } else if (object instanceof Iterable) {
+            if (cycleLink.containsKey(object)) {
+                xmlWriter.writeCharacters("cyclic");
+                return;
+            } else {
+                cycleLink.put(object, true);
+            }
+            if (!((Iterable) object).iterator().hasNext()) {
+                xmlWriter.writeEmptyElement("list");
+            } else {
+                xmlWriter.writeStartElement("list");
+                Iterator ptr = ((Iterable) object).iterator();
+                while (ptr.hasNext()) {
+                    xmlWriter.writeStartElement("value");
+                    printObject(ptr.next());
+                    xmlWriter.writeEndElement();
+                }
+                xmlWriter.writeEndElement();
+            }
+        } else {
+            xmlWriter.writeCharacters(object.toString());
+        }
+    }
 
+    public void  printArguments(Object[] arguments) {
+        try {
+            if (arguments.length > 0) {
+                xmlWriter.writeStartElement("arguments");
+                for (final Object temp: arguments) {
+                    xmlWriter.writeStartElement("argument");
+                    printObject(temp);
+                    xmlWriter.writeEndElement();
+                }
+                xmlWriter.writeEndElement();
+            } else {
+                xmlWriter.writeEmptyElement("arguments");
+            }
+            xmlWriter.writeCharacters("");
+        } catch (Exception e) {
+            throw Exceptions.runtime(e,"failed to print log");
+        }
+    }
 
-    public void printMainInformation(Object object, Method method) throws IOException {
+    public String writeMethod(Method method, Class clazz, Object returnValue, Throwable exception,
+                              Object[] arguments) {
         try {
             xmlWriter.writeStartElement("invoke");
             xmlWriter.writeAttribute("timestamp", Long.toString(System.currentTimeMillis()));
-            xmlWriter.writeAttribute("class", object.getClass().getName());
+            xmlWriter.writeAttribute("class", clazz.getName());
             xmlWriter.writeAttribute("name", method.getName());
-        } catch (XMLStreamException e) {
-            throw new IOException("Error in XML " +  e.getMessage());
-        }
-    }
-
-    public void printArguments(Object[] arguments) throws XMLStreamException {
-        if (arguments != null) {
-            if (arguments.length == 0) {
-                xmlWriter.writeEmptyElement("arguments");
-            } else {
-                for (final Object temp: arguments) {
-                    xmlWriter.writeStartElement("argument");
-                    if (temp == null) {
-                        xmlWriter.writeEmptyElement("null");
-                    } else if (temp instanceof Iterable) {
-                        cycleLink.put(temp, true);
-                        printList((Iterable) temp);
-                    } else {
-                        xmlWriter.writeCharacters(temp.toString());
-                    }
+            xmlWriter.writeCharacters("");
+            if (arguments != null) {
+                printArguments(arguments);
+            }
+            if (exception == null) {
+                if (!method.getReturnType().toString().equals("void")) {
+                    xmlWriter.writeStartElement("return");
+                    printObject(returnValue);
                     xmlWriter.writeEndElement();
                 }
-            }
-        }
-    }
-
-    private void printList(Iterable list) throws XMLStreamException {
-        xmlWriter.writeStartElement("list");
-        for (final Object tempObject: list) {
-            xmlWriter.writeStartElement("value");
-            if (tempObject == null) {
-                xmlWriter.writeEmptyElement("null");
-            } else if (tempObject instanceof Iterable && cycleLink.containsKey(tempObject)) {
-                xmlWriter.writeCharacters("cyclic");
-            } else if (tempObject instanceof Iterable) {
-                cycleLink.put(tempObject, true);
-                printList((Iterable)tempObject);
             } else {
-                xmlWriter.writeCharacters(tempObject.toString());
-            }
-            xmlWriter.writeEndElement();
-        }
-        xmlWriter.writeEndElement();
-    }
-
-    public void printException(Throwable e) throws IOException, XMLStreamException {
-            xmlWriter.writeStartElement("thrown");
-            xmlWriter.writeCharacters(e.toString());
-            xmlWriter.writeEndElement();
-    }
-
-    public void printReturnValue(Object returnValue) throws IOException, XMLStreamException {
-        try {
-            xmlWriter.writeStartElement("return");
-            if (returnValue == null) {
-                xmlWriter.writeCharacters("null");
-            } else {
-                xmlWriter.writeCharacters(returnValue.toString());
-            }
-            xmlWriter.writeEndElement();
-        } catch (XMLStreamException e) {
-            throw e;
-        }
-    }
-
-    public void writeArguments(Object[] arguments) throws XMLStreamException {
-        if (arguments != null) {
-            if (arguments.length == 0) {
-                xmlWriter.writeEmptyElement("arguments");
-            } else {
-                xmlWriter.writeStartElement("arguments");
-                writeIterable(Arrays.asList(arguments));
+                xmlWriter.writeStartElement("thrown");
+                printObject(exception);
                 xmlWriter.writeEndElement();
             }
-        }
-    }
-
-    private void writeIterable(Iterable args) throws XMLStreamException {
-        containedArguments.add(args);
-        for (Object argument: args) {
-            if (argument == null) {
-               xmlWriter.writeEmptyElement("null");
-            } else if (argument instanceof Iterable) {
-                if (containedArguments.contains(argument)) {
-                    xmlWriter.writeCharacters("cyclic");
-                } else {
-                    xmlWriter.writeStartElement("list");
-                    writeIterable((Iterable) argument);
-                    xmlWriter.writeEndElement();
-                }
-            } else if (argument.getClass().isArray()) {
-                xmlWriter.writeStartElement("value");
-                xmlWriter.writeCharacters(argument.toString());
-                xmlWriter.writeEndElement();
-            } else {
-                xmlWriter.writeStartElement("value");
-                xmlWriter.writeCharacters(argument.toString());
-                xmlWriter.writeEndElement();
-            }
-        }
-    }
-
-    public void close() throws IOException{
-        try {
             xmlWriter.writeEndElement();
-            writer.write(xmlWriter.toString() + "\n");
-            writer.flush();
-        } catch (XMLStreamException e) {
-            throw new IOException("error while closing: " + e.getMessage());
+            xmlWriter.flush();
+            return stringWriter.toString();
+        } catch (Exception e) {
+            throw Exceptions.runtime(e, "Failed to print log");
         }
+
     }
+
+
 }

@@ -21,13 +21,12 @@ public class Logging implements LoggingProxyFactory {
             throw new IllegalArgumentException("One of the arguments equals null");
         }
         if (!interfaceClass.isInterface()) {
-            throw new IllegalArgumentException(interfaceClass.getName() + "is not interface");
+            throw new IllegalArgumentException("Interface is not interface");
         }
-        if (!interfaceClass.isInstance(implementation)) {
-            throw new IllegalArgumentException(implementation.getClass()
-                    + "is not instance of " + interfaceClass.getName());
+        if (!interfaceClass.isAssignableFrom(implementation.getClass())) {
+            throw new IllegalArgumentException("Implemintation is not assignable from interface");
         }
-        return Proxy.newProxyInstance(implementation.getClass().getClassLoader(), new Class[]{interfaceClass},
+        return Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), new Class[]{interfaceClass},
                 new ProxyHandlerImpl(implementation, writer));
     }
 }

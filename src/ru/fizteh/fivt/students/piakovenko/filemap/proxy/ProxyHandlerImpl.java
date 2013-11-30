@@ -24,23 +24,25 @@ public class ProxyHandlerImpl implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] arguments) throws Throwable {
         if (method.getDeclaringClass().equals(Object.class)) {
-            return method.invoke(object, arguments);
+            return method.invoke(this, arguments);
         }
+
         Object result = null;
-        XmlLogging logWriter = new XmlLogging(writer);
-        logWriter.printMainInformation(object, method);
-        logWriter.writeArguments(arguments);
+        String log = null;
+        XmlLogging logWriter = new XmlLogging();
         try {
             result = method.invoke(object, arguments);
-            if (method.getReturnType() != void.class) {
-                logWriter.printReturnValue(result);
+            log = logWriter.writeMethod(method, object.getClass(), result, null, arguments);
+            return result;
+        } catch (Throwable e) {
+            if (e instanceof InvocationTargetException) {
+                e = ((InvocationTargetException) e).getTargetException();
             }
-        } catch (InvocationTargetException e) {
-            logWriter.printException(e);
-            throw e.getTargetException();
+            logWriter.writeMethod(method, object.getClass(), result, e, arguments);
         } finally {
-            logWriter.close();
+            writer.append(log);
+            writer.append(System.lineSeparator());
         }
-        return result;
+        return null;
     }
 }
