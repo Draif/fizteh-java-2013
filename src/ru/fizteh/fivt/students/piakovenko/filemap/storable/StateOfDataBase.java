@@ -14,11 +14,13 @@ public class StateOfDataBase {
         valid = true;
     }
 
-    public boolean check() {
-        return valid;
+    synchronized public void check() throws IllegalStateException {
+        if (!valid) {
+            throw new IllegalStateException("this method was closed!");
+        }
     }
 
-    public void change(boolean valid) {
+    synchronized public void change(boolean valid) {
         this.valid = valid;
     }
 }
