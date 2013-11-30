@@ -10,8 +10,6 @@ package ru.fizteh.fivt.students.piakovenko.filemap.storable;
 
 import ru.fizteh.fivt.storage.structured.ColumnFormatException;
 import ru.fizteh.fivt.storage.structured.Storeable;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 

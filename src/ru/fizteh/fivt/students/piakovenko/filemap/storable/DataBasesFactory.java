@@ -21,7 +21,8 @@ public class DataBasesFactory implements TableProviderFactory, AutoCloseable {
     private StateOfDataBase stateOfDataBase = new StateOfDataBase();
     private Map<String, DataBasesCommander> commanders = new HashMap<String, DataBasesCommander>();
 
-    public synchronized TableProvider create(String dir) throws IllegalArgumentException, IOException, IllegalStateException {
+    public synchronized TableProvider create(String dir)
+            throws IllegalArgumentException, IOException, IllegalStateException {
         stateOfDataBase.check();
         Checker.stringNotEmpty(dir);
         File fileMapStorage;
@@ -44,7 +45,7 @@ public class DataBasesFactory implements TableProviderFactory, AutoCloseable {
     }
 
     @Override
-    synchronized public void close() {
+    public synchronized void close() {
         for (final DataBasesCommander temp: commanders.values()) {
             temp.close();
         }
