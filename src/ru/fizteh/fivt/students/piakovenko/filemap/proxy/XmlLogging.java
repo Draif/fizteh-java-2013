@@ -151,7 +151,6 @@ public class XmlLogging {
         try {
             xmlWriter.writeEndElement();
             writer.write(xmlWriter.toString() + "\n");
-            xmlWriter.flush();
         } catch (XMLStreamException e) {
             throw new IOException("error while closing: " + e.getMessage());
         }
