@@ -1,13 +1,11 @@
 package ru.fizteh.fivt.students.piakovenko.filemap.proxy;
 
-import ru.fizteh.fivt.common.Exceptions;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -28,7 +26,7 @@ public class XmlLogging {
         try {
             xmlWriter = factory.createXMLStreamWriter(stringWriter);
         } catch (XMLStreamException e) {
-            throw new IOException("error with print Mehod" + e.getMessage());
+            throw new RuntimeException("error with print Mehod" + e.getMessage());
         }
     }
     public void printObject(Object object) throws Exception {
@@ -73,7 +71,7 @@ public class XmlLogging {
             }
             xmlWriter.writeCharacters("");
         } catch (Exception e) {
-            throw Exceptions.runtime(e,"failed to print log");
+            throw new RuntimeException("failed to print log");
         }
     }
 
@@ -103,7 +101,7 @@ public class XmlLogging {
             xmlWriter.flush();
             return stringWriter.toString();
         } catch (Exception e) {
-            throw Exceptions.runtime(e, "Failed to print log");
+            throw new RuntimeException("Failed to print log");
         }
 
     }
