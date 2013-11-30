@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.IdentityHashMap;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,6 +24,7 @@ public class XmlLogging {
     //private Object object = null;
     private XMLStreamWriter xmlWriter = null;
     StringWriter stringWriter = new StringWriter();
+    private final Set<Object> containedArguments = Collections.newSetFromMap(new IdentityHashMap<Object, Boolean>());
     private IdentityHashMap<Object, Boolean> cycleLink = new IdentityHashMap<Object, Boolean>();
 
 
@@ -102,7 +106,42 @@ public class XmlLogging {
         }
     }
 
+    public void writeArguments(Object[] arguments) throws XMLStreamException {
+        if (arguments != null) {
+            if (arguments.length == 0) {
+                xmlWriter.writeEmptyElement("arguments");
+            } else {
+                xmlWriter.writeStartElement("arguments");
+                writeIterable(Arrays.asList(arguments));
+                xmlWriter.writeEndElement();
+            }
+        }
+    }
 
+    private void writeIterable(Iterable args) throws XMLStreamException {
+        containedArguments.add(args);
+        for (Object argument: args) {
+            if (argument == null) {
+               xmlWriter.writeEmptyElement("null");
+            } else if (argument instanceof Iterable) {
+                if (containedArguments.contains(argument)) {
+                    xmlWriter.writeCharacters("cyclic");
+                } else {
+                    xmlWriter.writeStartElement("list");
+                    writeIterable((Iterable) argument);
+                    xmlWriter.writeEndElement();
+                }
+            } else if (argument.getClass().isArray()) {
+                xmlWriter.writeStartElement("value");
+                xmlWriter.writeCharacters(argument.toString());
+                xmlWriter.writeEndElement();
+            } else {
+                xmlWriter.writeStartElement("value");
+                xmlWriter.writeCharacters(argument.toString());
+                xmlWriter.writeEndElement();
+            }
+        }
+    }
 
     public void close() throws IOException{
         try {

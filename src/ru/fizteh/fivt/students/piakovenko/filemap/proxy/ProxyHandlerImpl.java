@@ -22,14 +22,14 @@ public class ProxyHandlerImpl implements InvocationHandler {
         this.writer = writer;
     }
     @Override
-    public Object invoke(Object proxy, Method method, Object[] argumnets) throws Throwable {
+    public Object invoke(Object proxy, Method method, Object[] argumenets) throws Throwable {
         Object result = null;
         if (!method.getDeclaringClass().equals(Object.class)) {
             XmlLogging logWriter = new XmlLogging(writer);
             logWriter.printMainInformation(object, method);
-            logWriter.printArguments(argumnets);
+            logWriter.writeArguments(argumenets);
             try {
-                result = method.invoke(argumnets);
+                result = method.invoke(argumenets);
                 if (!(result instanceof Void)) {
                     logWriter.printReturnValue(result);
                 }
@@ -39,7 +39,7 @@ public class ProxyHandlerImpl implements InvocationHandler {
             }
         } else {
             try {
-                result = method.invoke(argumnets);
+                result = method.invoke(argumenets);
             } catch (InvocationTargetException e) {
                 throw e.getTargetException();
             }
