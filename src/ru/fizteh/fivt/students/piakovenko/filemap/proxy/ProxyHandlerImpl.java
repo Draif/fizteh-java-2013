@@ -29,7 +29,7 @@ public class ProxyHandlerImpl implements InvocationHandler {
             logWriter.printMainInformation(object, method);
             logWriter.writeArguments(argumenets);
             try {
-                result = method.invoke(argumenets);
+                result = method.invoke(object, argumenets);
                 if (method.getReturnType() != void.class) {
                     logWriter.printReturnValue(result);
                 }
@@ -40,7 +40,7 @@ public class ProxyHandlerImpl implements InvocationHandler {
             logWriter.close();
         } else {
             try {
-                result = method.invoke(argumenets);
+                result = method.invoke(object, argumenets);
             } catch (InvocationTargetException e) {
                 throw e.getTargetException();
             }
