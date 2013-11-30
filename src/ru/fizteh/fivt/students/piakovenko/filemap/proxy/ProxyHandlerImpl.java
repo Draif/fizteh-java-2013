@@ -37,6 +37,7 @@ public class ProxyHandlerImpl implements InvocationHandler {
                 logWriter.printException(e);
                 throw e.getTargetException();
             }
+            logWriter.close();
         } else {
             try {
                 result = method.invoke(argumenets);
