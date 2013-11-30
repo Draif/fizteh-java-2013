@@ -72,11 +72,11 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
         stateOfDataBase.check();
         if (filesMap.containsKey(dataBase)) {
             if (currentDataBase != null && currentDataBase.numberOfChanges() != 0) {
-                System.out.println(currentDataBase.numberOfChanges() + " unsaved changes");
+                //System.out.println(currentDataBase.numberOfChanges() + " unsaved changes");
                 return;
             }
             if (filesMap.get(dataBase).equals(currentDataBase)) {
-                System.out.println("using " + dataBase);
+                //System.out.println("using " + dataBase);
                 return;
             }  else if (currentDataBase != null) {
                 currentDataBase.saveDataBase();
@@ -84,9 +84,9 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
             currentDataBase = filesMap.get(dataBase);
             currentDataBase.load();
             state.changeTable(currentDataBase);
-            System.out.println("using " + dataBase);
+           // System.out.println("using " + dataBase);
         } else {
-            System.out.println(dataBase + " not exists");
+            //System.out.println(dataBase + " not exists");
         }
     }
 
@@ -111,9 +111,9 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
                     System.exit(1);
                 }*/
                 filesMap.remove(dataBase);
-                System.out.println("dropped");
+                //System.out.println("dropped");
             } else {
-                System.out.println(dataBase + " not exists");
+                //System.out.println(dataBase + " not exists");
                 throw new IllegalStateException(dataBase + " not exists");
             }
         } finally {
@@ -130,7 +130,7 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
         try {
             readWriteLock.writeLock().lock();
             if (filesMap.containsKey(name)) {
-                System.out.println(name + " exists");
+               // System.out.println(name + " exists");
             } else {
                 File newFileMap = new File(dataBaseDirectory, name);
                 if (newFileMap.isFile()) {
@@ -142,7 +142,7 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
                         System.exit(1);
                     }
                 }
-                System.out.println("created");
+                //System.out.println("created");
                 filesMap.put(name, new DataBase(shell, newFileMap, this, columnTypes));
                 return filesMap.get(name);
             }

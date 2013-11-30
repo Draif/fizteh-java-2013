@@ -454,7 +454,7 @@ public class DataBase implements Table, AutoCloseable {
         stateOfDataBase.check();
         try {
             lock.lock();
-            System.out.println(transaction.get().transactionGetSize());
+           //System.out.println(transaction.get().transactionGetSize());
             return transaction.get().transactionGetSize();
         } finally {
             lock.unlock();
