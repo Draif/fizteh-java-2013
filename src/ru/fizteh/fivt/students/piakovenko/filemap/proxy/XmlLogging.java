@@ -39,11 +39,15 @@ public class XmlLogging {
     }
 
 
-    public void printMainInformation(Object object, Method method) throws IOException, XMLStreamException {
+    public void printMainInformation(Object object, Method method) throws IOException {
+        try {
             xmlWriter.writeStartElement("invoke");
             xmlWriter.writeAttribute("timestamp", Long.toString(System.currentTimeMillis()));
             xmlWriter.writeAttribute("class", object.getClass().getName());
             xmlWriter.writeAttribute("name", method.getName());
+        } catch (XMLStreamException e) {
+            throw new IOException(e.getNestedException());
+        }
     }
 
     public void printArguments(Object[] arguments) throws XMLStreamException {

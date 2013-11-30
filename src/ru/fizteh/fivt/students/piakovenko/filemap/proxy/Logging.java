@@ -14,8 +14,6 @@ import java.lang.reflect.Proxy;
  */
 public class Logging implements LoggingProxyFactory {
 
-    public Logging() {
-    }
 
     @Override
     public Object wrap(Writer writer, Object implementation, Class<?> interfaceClass) throws IllegalArgumentException {
