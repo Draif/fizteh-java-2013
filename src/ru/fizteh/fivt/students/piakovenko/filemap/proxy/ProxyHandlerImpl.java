@@ -30,7 +30,7 @@ public class ProxyHandlerImpl implements InvocationHandler {
             logWriter.writeArguments(argumenets);
             try {
                 result = method.invoke(argumenets);
-                if (!(result instanceof Void)) {
+                if (method.getReturnType() != void.class) {
                     logWriter.printReturnValue(result);
                 }
             } catch (InvocationTargetException e) {
