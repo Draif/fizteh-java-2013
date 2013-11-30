@@ -56,7 +56,7 @@ public class XmlLogging {
                         cycleLink.put(temp, true);
                         printList((Iterable) temp);
                     } else {
-                        xmlWriter.writeCharacters(object.toString());
+                        xmlWriter.writeCharacters(tempObject.toString());
                     }
                     xmlWriter.writeEndElement();
                 }
