@@ -20,6 +20,10 @@ public class StateOfDataBase {
         }
     }
 
+    public boolean isValid() {
+        return valid;
+    }
+
     public synchronized void change(boolean valid) {
         this.valid = valid;
     }
