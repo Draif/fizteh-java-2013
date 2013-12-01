@@ -12,21 +12,22 @@ import java.io.IOException;
 
 public class Start {
     public static void  main(String[] args) {
-        try {
-            DataBasesFactory dbf = new DataBasesFactory();
-            try {
-                dbf.create(System.getProperty("fizteh.db.dir"));
-                dbf.start(args);
-            } catch (IllegalArgumentException e) {
-                System.err.println("Error! " + e.getMessage());
-                System.exit(1);
-            } catch (IOException e) {
-                System.err.println("Error! " + e.getMessage());
-                System.exit(1);
-            }
-        } catch (IllegalArgumentException e) {
-            System.err.println("Error! " + e.getMessage());
+        String databaseDirectory = System.getProperty("fizteh.db.dir");
+        if (databaseDirectory == null) {
+            System.err.println("You haven't set database directory");
             System.exit(1);
         }
+        try {
+            DataBasesFactory factory = new  DataBasesFactory();
+            factory.create(databaseDirectory);
+            factory.start(args);
+        } catch (IOException e) {
+            System.err.println("some error occurred during loading: " + e.getMessage());
+            System.exit(1);
+        } catch (IllegalArgumentException e) {
+            System.err.println("error while loading: " + e.getMessage());
+            System.exit(1);
+        }
+
     }
 }
