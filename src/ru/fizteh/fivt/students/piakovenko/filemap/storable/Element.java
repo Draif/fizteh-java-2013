@@ -33,10 +33,11 @@ public class Element implements Storeable {
 
 
     public Element(List<Class<?>> classes) {
-        storageClasses = new ArrayList<Class<?>>(classes);
-        storage = new ArrayList<Object>();
-        for (int i = 0; i < storageClasses.size(); ++i) {
+        storageClasses = new ArrayList<>();
+        storage = new ArrayList<>();
+        for (int i = 0; i < classes.size(); ++i) {
             storage.add(null);
+            storageClasses.add(classes.get(i));
         }
     }
 
