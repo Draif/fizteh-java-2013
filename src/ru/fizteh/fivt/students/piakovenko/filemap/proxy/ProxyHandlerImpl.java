@@ -39,10 +39,10 @@ public class ProxyHandlerImpl implements InvocationHandler {
                 e = ((InvocationTargetException) e).getTargetException();
             }
             logWriter.writeMethod(method, object.getClass(), result, e, arguments);
+            throw e;
         } finally {
             writer.append(log);
             writer.append(System.lineSeparator());
         }
-        return null;
     }
 }
