@@ -103,7 +103,7 @@ public class XmlLogging {
             xmlWriter.flush();
             return stringWriter.toString();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to print log");
+            throw new RuntimeException("Failed to print log" + e.getMessage());
         }
 
     }
