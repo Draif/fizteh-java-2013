@@ -40,7 +40,8 @@ public class ProxyHandlerImpl implements InvocationHandler {
             logWriter.writeMethod(method, object.getClass(), result, target, arguments);
             throw target;
         } catch (Exception e){
-            //can't do anything
+            logWriter.writeMethod(method, object.getClass(), null, null, arguments);
+            throw e;
         } finally {
             if (log != null) {
                 try {

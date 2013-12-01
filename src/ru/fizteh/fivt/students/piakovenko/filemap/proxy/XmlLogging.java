@@ -89,7 +89,7 @@ public class XmlLogging {
                 xmlWriter.writeEmptyElement("arguments");
             }
             if (exception == null) {
-                if (!method.getReturnType().toString().equals("void")) {
+                if (returnValue != null && !method.getReturnType().toString().equals("void")) {
                     xmlWriter.writeStartElement("return");
                     printObject(returnValue);
                     xmlWriter.writeEndElement();
