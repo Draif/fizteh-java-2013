@@ -50,8 +50,7 @@ public class Element implements Storeable {
                 throw new ColumnFormatException("Wrong column type!");
             }
         }
-        storage.remove(columnIndex);
-        storage.add(columnIndex, value);
+        storage.set(columnIndex, value);
     }
 
     public Object getColumnAt(int columnIndex) throws IndexOutOfBoundsException {
@@ -134,8 +133,12 @@ public class Element implements Storeable {
         sb.append(this.getClass().getSimpleName());
         sb.append("[");
         for (int i = 0; i < storage.size(); ++i) {
-            if (storage.get(i).toString() != null) {
-                sb.append(storage.get(i).toString());
+            if (storage.get(i) != null) {
+                if (storage.get(i).toString() != null) {
+                    sb.append(storage.get(i).toString());
+                }
+            } else {
+                sb.append("null");
             }
             if (i != storage.size() - 1) {
                 sb.append(",");
