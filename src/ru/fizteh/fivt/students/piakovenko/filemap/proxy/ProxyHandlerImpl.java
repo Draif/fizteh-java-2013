@@ -35,7 +35,10 @@ public class ProxyHandlerImpl implements InvocationHandler {
             result = method.invoke(object, arguments);
             log = logWriter.writeMethod(method, object.getClass(), result, null, arguments);
             return result;
-        } catch (InvocationTargetException e) {
+        } catch (Throwable e) {
+            if (e instanceof InvocationTargetException) {
+                e = ((InvocationTargetException) e).getTargetException();
+            }
             log = logWriter.writeMethod(method, object.getClass(), result, e, arguments);
             throw e;
         } finally {
