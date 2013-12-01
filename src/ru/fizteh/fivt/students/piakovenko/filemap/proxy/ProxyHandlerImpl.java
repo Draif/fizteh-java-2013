@@ -1,5 +1,6 @@
 package ru.fizteh.fivt.students.piakovenko.filemap.proxy;
 
+import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -24,7 +25,7 @@ public class ProxyHandlerImpl implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] arguments) throws Throwable {
         if (method.getDeclaringClass().equals(Object.class)) {
-            return method.invoke(this, arguments);
+            return method.invoke(object, arguments);
         }
 
         Object result = null;
@@ -41,8 +42,14 @@ public class ProxyHandlerImpl implements InvocationHandler {
             logWriter.writeMethod(method, object.getClass(), result, e, arguments);
             throw e;
         } finally {
-            writer.append(log);
-            writer.append(System.lineSeparator());
+            if (log != null) {
+                try {
+                    writer.append(log);
+                    writer.append(System.lineSeparator());
+                } catch (IOException e) {
+                    //can't do anything
+                }
+            }
         }
     }
 }
