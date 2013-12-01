@@ -137,8 +137,6 @@ public class Element implements Storeable {
                 if (storage.get(i).toString() != null) {
                     sb.append(storage.get(i).toString());
                 }
-            } else {
-                sb.append("null");
             }
             if (i != storage.size() - 1) {
                 sb.append(",");
