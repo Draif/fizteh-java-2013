@@ -2,8 +2,10 @@ package ru.fizteh.fivt.students.piakovenko.filemap;
 
 import ru.fizteh.fivt.storage.strings.Table;
 import ru.fizteh.fivt.storage.strings.TableProvider;
+import ru.fizteh.fivt.students.piakovenko.filemap.storable.JSON.JSONSerializer;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 
 /**
@@ -68,10 +70,10 @@ public class GlobalFileMapState {
         }
     }
 
-    public void createTable(String name) throws IllegalArgumentException {
+    public void createTable(String name) throws IllegalArgumentException, IOException {
         if (isStoreableMode) {
-            throw new IllegalArgumentException("GFMS: createTable! Storeable mode is on! "
-                    + "This command can't work in this mode!");
+            tableProviderStoreable.createTable(name.substring(0, name.indexOf(' ')),
+                    Utils.arrayList(name.substring(name.indexOf(' ') + 1)));
         } else {
             tableProviderStrings.createTable(name);
         }
@@ -101,8 +103,10 @@ public class GlobalFileMapState {
         }
     }
 
-    public void put(String key, String value) throws IOException {
-        if (!isStoreableMode) {
+    public void put(String key, String value) throws IOException, ParseException {
+        if (isStoreableMode) {
+            tableStoreable.put(key, JSONSerializer.deserialize(tableStoreable, value));
+        } else {
             tableStrings.put(key, value);
         }
     }
