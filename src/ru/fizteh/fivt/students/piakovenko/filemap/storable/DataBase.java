@@ -501,12 +501,7 @@ public class DataBase implements Table, AutoCloseable {
         return storeableClasses;
     }
     public boolean checkForClose() {
-        try {
-            stateOfDataBase.check();
-            return false;
-        } catch (IllegalStateException e) {
-            return true;
-        }
+        return !stateOfDataBase.isValid();
     }
 
     @Override
@@ -517,8 +512,10 @@ public class DataBase implements Table, AutoCloseable {
 
     @Override
     public synchronized void close() {
-        rollback();
-        stateOfDataBase.change(false);
+        if (stateOfDataBase.isValid()) {
+            rollback();
+            stateOfDataBase.change(false);
+        }
     }
 
 }
