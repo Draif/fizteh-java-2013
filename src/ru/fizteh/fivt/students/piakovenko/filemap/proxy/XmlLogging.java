@@ -89,7 +89,7 @@ public class XmlLogging {
                 xmlWriter.writeEmptyElement("arguments");
             }
             if (exception == null) {
-                if (returnValue != null && !method.getReturnType().toString().equals("void")) {
+                if (!method.getReturnType().toString().equals("void")) {
                     xmlWriter.writeStartElement("return");
                     printObject(returnValue);
                     xmlWriter.writeEndElement();
@@ -103,7 +103,7 @@ public class XmlLogging {
             xmlWriter.flush();
             return stringWriter.toString();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to print log" + e.getMessage());
+            throw new RuntimeException("Failed to print log " + e.getMessage());
         }
 
     }
