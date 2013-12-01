@@ -130,7 +130,9 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
         Checker.checkColumnTypes(columnTypes);
         try {
             readWriteLock.writeLock().lock();
-            if (!filesMap.containsKey(name)) {
+            if (filesMap.containsKey(name)) {
+                return null;
+            } else {
                 File newFileMap = new File(dataBaseDirectory, name);
                 if (newFileMap.isFile()) {
                     throw new IllegalArgumentException("try create table on file");
@@ -142,8 +144,8 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
                     }
                 }
                 filesMap.put(name, new DataBase(shell, newFileMap, this, columnTypes));
+                return filesMap.get(name);
             }
-            return filesMap.get(name);
         } finally {
             readWriteLock.writeLock().unlock();
         }
