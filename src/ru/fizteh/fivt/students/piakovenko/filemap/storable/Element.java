@@ -46,15 +46,12 @@ public class Element implements Storeable {
             throw  new IndexOutOfBoundsException("setColumnAt - wrong index!");
         }
         if (value != null) {
-            classChecker(columnIndex, value.getClass());
-            if ((value.getClass().getName().equals("java.lang.String"))
-                    && ((String) value).trim().isEmpty()) {
-                storage.set(columnIndex, value);
-                return;
+            if (value.getClass() != storageClasses.get(columnIndex)) {
+                throw new ColumnFormatException("Wrong column type!");
             }
-            classChecker(columnIndex, value.getClass());
         }
-        storage.set(columnIndex, value);
+        storage.remove(columnIndex);
+        storage.add(columnIndex, value);
     }
 
     public Object getColumnAt(int columnIndex) throws IndexOutOfBoundsException {
