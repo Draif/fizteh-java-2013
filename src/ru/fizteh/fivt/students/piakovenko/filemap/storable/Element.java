@@ -134,9 +134,7 @@ public class Element implements Storeable {
         sb.append("[");
         for (int i = 0; i < storage.size(); ++i) {
             if (storage.get(i) != null) {
-                if (storage.get(i).toString() != null) {
-                    sb.append(storage.get(i).toString());
-                }
+                sb.append(storage.get(i).toString());
             }
             if (i != storage.size() - 1) {
                 sb.append(",");
