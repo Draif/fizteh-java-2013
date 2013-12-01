@@ -42,7 +42,9 @@ public class Element implements Storeable {
     }
 
     public void setColumnAt(int columnIndex, Object value) throws ColumnFormatException, IndexOutOfBoundsException {
-        classChecker(columnIndex, value.getClass());
+        if (value != null) {
+            classChecker(columnIndex, value.getClass());
+        }
         if (!columnChecker(columnIndex)) {
             throw  new IndexOutOfBoundsException("setColumnAt - wrong index!");
         }
