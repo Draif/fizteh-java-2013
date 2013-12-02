@@ -30,7 +30,7 @@ public class Commit implements Commands {
             throw new IOException("Wrong number of arguments! Usage: commit");
         }
         if (!db.isValidTable()) {
-            System.out.println("no table");
+            //System.out.println("no table");
             return;
         }
         db.commit();

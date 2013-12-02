@@ -25,7 +25,7 @@ public class Rollback implements Commands {
 
     public void perform(String[] args) throws IOException {
         if (!db.isValidTable()) {
-            System.out.println("no table");
+            //System.out.println("no table");
             return;
         }
         if (args.length != 1) {

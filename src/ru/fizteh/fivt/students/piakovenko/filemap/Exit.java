@@ -33,7 +33,7 @@ public class Exit implements Commands {
         try {
             db.saveTable();
         } catch (IOException e) {
-            System.err.println("Error! " + e.getMessage());
+            //System.err.println("Error! " + e.getMessage());
             System.exit(1);
         }
         System.exit(0);
