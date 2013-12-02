@@ -142,7 +142,7 @@ public class DataBase implements Table {
                 }
             }
         } catch (IOException e) {
-            System.err.println("Error! " + e.getMessage());
+            //System.err.println("Error! " + e.getMessage());
             System.exit(1);
         } finally {
             if (ra != null) {
@@ -211,7 +211,7 @@ public class DataBase implements Table {
         try {
             readFromFile();
         } catch (IOException e) {
-            System.err.println("Error! " + e.getCause());
+            //System.err.println("Error! " + e.getCause());
             System.exit(1);
         }
     }
@@ -271,7 +271,7 @@ public class DataBase implements Table {
         try {
             load();
         } catch (IOException e) {
-            System.err.println("Error! " + e.getMessage());
+            //System.err.println("Error! " + e.getMessage());
             System.exit(1);
         }
     }
@@ -316,14 +316,14 @@ public class DataBase implements Table {
     }
 
     public int size() {
-        System.out.println(map.getMap().size());
+        //System.out.println(map.getMap().size());
         return map.getMap().size();
     }
 
     public int commit() {
         int tempChanged = map.changed();
         map.commit();
-        System.out.println(tempChanged);
+        //System.out.println(tempChanged);
         return tempChanged;
     }
 
@@ -331,7 +331,7 @@ public class DataBase implements Table {
         int tempChanged = map.changed();
         map.getMap().clear();
         map.rollback();
-        System.out.println(tempChanged);
+        //System.out.println(tempChanged);
         return tempChanged;
     }
 

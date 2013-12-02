@@ -26,6 +26,6 @@ public class PrintWorkingDirectory implements Commands {
         if (s.length != 1) {
             throw new IOException("Wrong arguments! Usage ~ pwd");
         }
-        System.out.println(currentStatus.getCurrentDirectory());
+        //System.out.println(currentStatus.getCurrentDirectory());
     }
 }

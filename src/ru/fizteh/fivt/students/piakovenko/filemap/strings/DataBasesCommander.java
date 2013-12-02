@@ -78,11 +78,11 @@ public class DataBasesCommander implements TableProvider {
     public void use(String dataBase) throws IOException {
         if (filesMap.containsKey(dataBase)) {
             if (currentDataBase != null && currentDataBase.numberOfChanges() != 0) {
-                System.out.println(currentDataBase.numberOfChanges() + " unsaved changes");
+                //System.out.println(currentDataBase.numberOfChanges() + " unsaved changes");
                 return;
             }
             if (filesMap.get(dataBase).equals(currentDataBase)) {
-                System.out.println("using " + dataBase);
+                //System.out.println("using " + dataBase);
                 return;
             } else if (currentDataBase != null) {
                 currentDataBase.saveDataBase();
@@ -90,9 +90,9 @@ public class DataBasesCommander implements TableProvider {
             currentDataBase = filesMap.get(dataBase);
             currentDataBase.load();
             state.changeTable(currentDataBase);
-            System.out.println("using " + dataBase);
+            //System.out.println("using " + dataBase);
         } else {
-            System.out.println(dataBase + " not exists");
+            //System.out.println(dataBase + " not exists");
         }
     }
 
@@ -109,13 +109,13 @@ public class DataBasesCommander implements TableProvider {
                 ru.fizteh.fivt.students.piakovenko.shell.Remove.removeRecursively(
                         filesMap.get(dataBase).returnFiledirectory());
             } catch (IOException e) {
-                System.err.println("Error! " + e.getMessage());
+                //System.err.println("Error! " + e.getMessage());
                 System.exit(1);
             }
             filesMap.remove(dataBase);
-            System.out.println("dropped");
+            //System.out.println("dropped");
         } else {
-            System.out.println(dataBase + " not exists");
+            //System.out.println(dataBase + " not exists");
             throw new IllegalStateException(dataBase + " not exists");
         }
     }
@@ -128,17 +128,17 @@ public class DataBasesCommander implements TableProvider {
             throw new RuntimeException("incorrect table name");
         }
         if (filesMap.containsKey(dataBase)) {
-            System.out.println(dataBase + " exists");
+            //System.out.println(dataBase + " exists");
         } else {
             File newFileMap = new File(dataBaseDirectory, dataBase);
             if (newFileMap.isFile()) {
                 throw new IllegalArgumentException("try create table on file");
             }
             if (!newFileMap.mkdirs()) {
-                System.err.println("Unable to create this directory - " + dataBase);
+                //System.err.println("Unable to create this directory - " + dataBase);
                 System.exit(1);
             }
-            System.out.println("created");
+            //System.out.println("created");
             filesMap.put(dataBase, new DataBase(shell, newFileMap));
             return filesMap.get(dataBase);
         }
