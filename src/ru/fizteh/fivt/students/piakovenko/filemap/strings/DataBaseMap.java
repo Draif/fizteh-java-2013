@@ -18,11 +18,11 @@ public class DataBaseMap {
         String oldValue = null;
         if (!map.containsKey(key)) {
             map.put(key, value);
-            System.out.println("new");
+            //System.out.println("new");
         } else {
-            System.out.println("overwrite");
+           // System.out.println("overwrite");
             oldValue = map.get(key);
-            System.out.println(oldValue);
+            //System.out.println(oldValue);
             map.remove(key);
             map.put(key, value);
         }
@@ -31,10 +31,10 @@ public class DataBaseMap {
 
     public String get(String key) {
         if (!map.containsKey(key)) {
-            System.out.println("not found");
+            //System.out.println("not found");
         } else {
-            System.out.println("found");
-            System.out.println(map.get(key));
+            //System.out.println("found");
+            //System.out.println(map.get(key));
             return map.get(key);
         }
         return null;
@@ -42,11 +42,11 @@ public class DataBaseMap {
 
     public String remove(String key) {
         if (!map.containsKey(key)) {
-            System.out.println("not found");
+            //System.out.println("not found");
         } else {
             String returnValue = map.get(key);
             map.remove(key);
-            System.out.println("removed");
+            //System.out.println("removed");
             return returnValue;
         }
         return null;

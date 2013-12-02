@@ -68,11 +68,11 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
         }
         if (filesMap.containsKey(dataBase)) {
             if (currentDataBase != null && currentDataBase.numberOfChanges() != 0) {
-                System.out.println(currentDataBase.numberOfChanges() + " unsaved changes");
+                //System.out.println(currentDataBase.numberOfChanges() + " unsaved changes");
                 return;
             }
             if (filesMap.get(dataBase).equals(currentDataBase)) {
-                System.out.println("using " + dataBase);
+                //System.out.println("using " + dataBase);
                 return;
             } else if (currentDataBase != null) {
                 currentDataBase.saveDataBase();
@@ -80,9 +80,9 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
             currentDataBase = filesMap.get(dataBase);
             currentDataBase.load();
             state.changeTable(currentDataBase);
-            System.out.println("using " + dataBase);
+            //System.out.println("using " + dataBase);
         } else {
-            System.out.println(dataBase + " not exists");
+            //System.out.println(dataBase + " not exists");
         }
     }
 
@@ -115,8 +115,18 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
                 System.out.println(dataBase + " not exists");
                 throw new IllegalStateException(dataBase + " not exists");
             }
-        } finally {
-            readWriteLock.writeLock().unlock();
+            try {
+                ru.fizteh.fivt.students.piakovenko.shell.Remove.removeRecursively(
+                        filesMap.get(dataBase).returnFiledirectory());
+            } catch (IOException e) {
+                //System.err.println("Error! " + e.getMessage());
+                System.exit(1);
+            }
+            filesMap.remove(dataBase);
+            //System.out.println("dropped");
+        } else {
+            //System.out.println(dataBase + " not exists");
+            throw new IllegalStateException(dataBase + " not exists");
         }
     }
 
@@ -125,61 +135,20 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
         if (!isValid) {
             throw new IllegalStateException("TableFactory is invalid");
         }
-        Checker.stringNotEmpty(name);
-        Checker.correctTableName(name);
-        Checker.checkColumnTypes(columnTypes);
-        try {
-            readWriteLock.writeLock().lock();
-            if (filesMap.containsKey(name)) {
-                System.out.println(name + " exists");
-            } else {
-                File newFileMap = new File(dataBaseDirectory, name);
-                if (newFileMap.isFile()) {
-                    throw new IllegalArgumentException("try create table on file");
-                }
-                if (!newFileMap.exists()) {
-                    if (!newFileMap.mkdirs()) {
-                        System.err.println("Unable to create this directory - " + name);
-                        System.exit(1);
-                    }
-                }
-                System.out.println("created");
-                filesMap.put(name, new DataBase(shell, newFileMap, this, columnTypes));
-                statesMap.put(name, new StateOfDataBase());
-                return filesMap.get(name);
+        if (filesMap.containsKey(dataBase)) {
+            //System.out.println(dataBase + " exists");
+        } else {
+            File newFileMap = new File(dataBaseDirectory, dataBase);
+            if (newFileMap.isFile()) {
+                throw new IllegalArgumentException("try create table on file");
             }
-            return null;
-        } finally {
-            readWriteLock.writeLock().unlock();
-        }
-    }
-
-    @Override
-    public Table getTable(String name) throws IllegalArgumentException, IllegalStateException {
-        if (!isValid) {
-            throw new IllegalStateException("TableFactory is invalid");
-        }
-        Checker.stringNotEmpty(name);
-        Checker.correctTableName(name);
-        try {
-            readWriteLock.readLock().lock();
-            if (filesMap.containsKey(name)) {
-                if (statesMap.get(name).check()) {
-                    return filesMap.get(name);
-                } else {
-                    List<Class<?>> temp = filesMap.get(name).storableClasses();
-                    File tempFileStorage = filesMap.get(name).returnFiledirectory();
-                    filesMap.remove(name);
-                    statesMap.remove(name);
-                    filesMap.put(name, new DataBase(shell,tempFileStorage, this, temp));
-                    statesMap.put(name, new StateOfDataBase());
-                    return filesMap.get(name);
-                }
-            } else {
-                return null;
+            if (!newFileMap.mkdirs()) {
+                //System.err.println("Unable to create this directory - " + dataBase);
+                System.exit(1);
             }
-        } finally {
-            readWriteLock.readLock().unlock();
+            //System.out.println("created");
+            filesMap.put(dataBase, new DataBase(shell, newFileMap));
+            return filesMap.get(dataBase);
         }
     }
 

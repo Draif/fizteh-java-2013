@@ -237,7 +237,7 @@ public class DataBase implements Table, AutoCloseable {
                 }
             }
         } catch (IOException e) {
-            System.err.println("Error! " + e.getMessage());
+            //System.err.println("Error! " + e.getMessage());
             System.exit(1);
         } finally {
             if (ra != null) {
@@ -306,7 +306,7 @@ public class DataBase implements Table, AutoCloseable {
         try {
             readFromFile();
         } catch (IOException e) {
-            System.err.println("Error! " + e.getCause());
+            //System.err.println("Error! " + e.getCause());
             System.exit(1);
         }
     }
@@ -384,7 +384,7 @@ public class DataBase implements Table, AutoCloseable {
         try {
             load();
         } catch (IOException e) {
-            System.err.println("Error! " + e.getMessage());
+            //System.err.println("Error! " + e.getMessage());
             System.exit(1);
         }
     }
@@ -454,45 +454,24 @@ public class DataBase implements Table, AutoCloseable {
         return dataBaseStorage;
     }
 
-    public int size() throws IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
-        try {
-            lock.lock();
-            System.out.println(transaction.get().transactionGetSize());
-            return transaction.get().transactionGetSize();
-        } finally {
-            lock.unlock();
-        }
+    public int size() {
+        //System.out.println(map.getMap().size());
+        return map.getMap().size();
     }
 
-    public int commit() throws IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
-        try {
-            lock.lock();
-            int changesCount = transaction.get().commit();
-            transaction.get().clearMap();
-            return changesCount;
-        } finally {
-            lock.unlock();
-        }
+    public int commit() {
+        int tempChanged = map.changed();
+        map.commit();
+        //System.out.println(tempChanged);
+        return tempChanged;
     }
 
-    public int rollback() throws IllegalStateException {
-        if (!parent.isDataBaseValid(name)) {
-            throw new IllegalStateException("this method was closed!");
-        }
-        try {
-            lock.lock();
-            int count = transaction.get().calcChanges();
-            transaction.get().clearMap();
-            return count;
-        } finally {
-            lock.unlock();
-        }
+    public int rollback() {
+        int tempChanged = map.changed();
+        map.getMap().clear();
+        map.rollback();
+        //System.out.println(tempChanged);
+        return tempChanged;
     }
 
     public int getColumnsCount() throws IllegalStateException {
