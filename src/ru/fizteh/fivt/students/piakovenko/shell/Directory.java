@@ -34,7 +34,7 @@ public class Directory implements Commands {
             throw new IOException("Error! " + currentStatus.getCurrentDirectory() + " is not a directory!");
         }
         for (String s : currentStatus.getCurrentFile().list()) {
-            System.out.println(s);
+            //System.out.println(s);
         }
     }
 }

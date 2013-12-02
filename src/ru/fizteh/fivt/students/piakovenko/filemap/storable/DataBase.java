@@ -241,7 +241,7 @@ public class DataBase implements Table, AutoCloseable {
                 }
             }
         } catch (IOException e) {
-            System.err.println("Error! " + e.getMessage());
+            //System.err.println("Error! " + e.getMessage());
             System.exit(1);
         } finally {
             if (ra != null) {
@@ -316,7 +316,7 @@ public class DataBase implements Table, AutoCloseable {
         try {
             readFromFile();
         } catch (IOException e) {
-            System.err.println("Error! " + e.getCause());
+            //System.err.println("Error! " + e.getCause());
             System.exit(1);
         }
     }
@@ -408,7 +408,7 @@ public class DataBase implements Table, AutoCloseable {
         try {
             load();
         } catch (IOException e) {
-            System.err.println("Error! " + e.getMessage());
+            //System.err.println("Error! " + e.getMessage());
             System.exit(1);
         }
     }
