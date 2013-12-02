@@ -305,6 +305,12 @@ public class DataBase implements Table, AutoCloseable {
         }
     }
 
+    private void loadClasses(File f) throws IOException {
+        RandomAccessFile temp = new RandomAccessFile(f, "r");
+        String types = temp.readLine();
+        storeableClasses = ru.fizteh.fivt.students.piakovenko.filemap.Utils.arrayList(types);
+    }
+
     private void loadDataBase(File dataBaseFile) throws IOException {
         raDataBaseFile = new RandomAccessFile(dataBaseFile, "rw");
         try {
@@ -325,6 +331,12 @@ public class DataBase implements Table, AutoCloseable {
     }
 
     private void loadFromDirectory(File directory) throws IOException {
+        File fileWithClasses = new File(directory, "signature.tsv");
+        if (!fileWithClasses.exists()) {
+            System.err.println("no file with classes!" + fileWithClasses.getCanonicalPath());
+        } else {
+            loadClasses(fileWithClasses);
+        }
         for (File f : directory.listFiles()) {
             if (!isValidNameDirectory(f.getName())) {
                 throw new IOException("Wrong name of directory!");
