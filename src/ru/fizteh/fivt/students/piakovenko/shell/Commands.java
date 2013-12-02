@@ -1,6 +1,7 @@
 package ru.fizteh.fivt.students.piakovenko.shell;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,5 +12,5 @@ import java.io.IOException;
  */
 public interface Commands {
     String getName();
-    void perform(String[] s) throws IOException;
+    void perform(String[] s) throws IOException, ParseException;
 }
