@@ -15,14 +15,14 @@ public class Shell {
         while (true) {
             try {
                 if (currentStatus == null) {
-                    System.out.print(startInvitation);
+                    //System.out.print(startInvitation);
                 } else {
-                    System.out.print(currentStatus.getCurrentDirectory() + " " + startInvitation);
+                    //System.out.print(currentStatus.getCurrentDirectory() + " " + startInvitation);
                 }
                 String s = sc.nextLine();
                 cm.execute(s);
             } catch (IOException e) {
-                System.err.println("Error! " + e.getMessage());
+                //System.err.println("Error! " + e.getMessage());
             }
         }
     }
@@ -37,7 +37,7 @@ public class Shell {
             cm.execute(sb.toString());
             cm.execute("exit");
         } catch (IOException e) {
-            System.err.println("Error! " + e.getMessage());
+            //System.err.println("Error! " + e.getMessage());
             System.exit(1);
         }
     }
