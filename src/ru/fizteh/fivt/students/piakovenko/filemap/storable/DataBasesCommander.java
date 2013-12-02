@@ -159,15 +159,15 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
         try {
             readWriteLock.readLock().lock();
             if (filesMap.containsKey(name)) {
-                if (!filesMap.get(name).checkForClose()) {
-                    return filesMap.get(name);
-                } else {
+                //if (!filesMap.get(name).checkForClose()) {
+                return filesMap.get(name);
+                /*} else {
                     List<Class<?>> temp = filesMap.get(name).storableClasses();
                     File tempFileStorage = filesMap.get(name).returnFiledirectory();
                     filesMap.remove(name);
                     filesMap.put(name, new DataBase(shell, tempFileStorage, this, temp));
                     return filesMap.get(name);
-                }
+                } */
             } else {
                 return null;
             }
