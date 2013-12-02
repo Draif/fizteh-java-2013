@@ -18,9 +18,9 @@ public class Checker {
         }
     }
 
-    public static void correctTableName(String name) throws RuntimeException {
+    public static void correctTableName(String name) throws IllegalArgumentException {
         if (!name.matches(TABLE_NAME_FORMAT)) {
-            throw new RuntimeException("incorrect table name");
+            throw new IllegalArgumentException("incorrect table name");
         }
     }
 
