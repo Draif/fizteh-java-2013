@@ -347,12 +347,14 @@ public class DataBase implements Table, AutoCloseable {
     }
 
     public DataBase(Shell sl, File storage, DataBasesCommander parent, List<Class<?>> columnTypes) {
-        map = new HashMap<String, Storeable>();
+        map = new HashMap<>();
         shell  = sl;
         dataBaseStorage = storage;
         name = storage.getName();
         storeableClasses = columnTypes;
         this.parent = parent;
+        File classesStorage = new File(storage, "signature.tsv");
+        DiskUtils.fixedClasses(classesStorage, columnTypes);
         transaction = new ThreadLocal<Transaction>() {
            @Override
            protected Transaction initialValue() {
