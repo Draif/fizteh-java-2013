@@ -375,6 +375,15 @@ public class DataBase implements Table, AutoCloseable {
         };
     }
 
+    public Map<String, Storeable> returnStorage() {
+        return map;
+    }
+
+    public void copyStorage(DataBase oldDataBase) {
+        map.clear();
+        map.putAll(oldDataBase.returnStorage());
+    }
+
 
     public void load() throws IOException {
         if (dataBaseStorage.isFile()) {
