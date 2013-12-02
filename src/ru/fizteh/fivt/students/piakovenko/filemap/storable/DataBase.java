@@ -188,7 +188,7 @@ public class DataBase implements Table, AutoCloseable {
                 map.put(new String(key, StandardCharsets.UTF_8), JSONSerializer.deserialize(
                         this, new String(value, StandardCharsets.UTF_8)));
             } catch (ParseException e) {
-                System.err.println("readFromFile: problem with desereliaze" + e.getMessage());
+                //System.err.println("readFromFile: problem with desereliaze" + e.getMessage());
                 System.exit(1);
             }
         }
@@ -235,7 +235,7 @@ public class DataBase implements Table, AutoCloseable {
                     try {
                         map.put(keyString, JSONSerializer.deserialize(this, valueString));
                     } catch (ParseException e) {
-                        System.err.println("readFromFile: problem with deserializer" + e.getMessage());
+                        //System.err.println("readFromFile: problem with deserializer" + e.getMessage());
                         System.exit(1);
                     }
                 }
@@ -333,7 +333,7 @@ public class DataBase implements Table, AutoCloseable {
     private void loadFromDirectory(File directory) throws IOException {
         File fileWithClasses = new File(directory, "signature.tsv");
         if (!fileWithClasses.exists()) {
-            System.err.println("no file with classes!" + fileWithClasses.getCanonicalPath());
+            //System.err.println("no file with classes!" + fileWithClasses.getCanonicalPath());
         } else {
             loadClasses(fileWithClasses);
         }

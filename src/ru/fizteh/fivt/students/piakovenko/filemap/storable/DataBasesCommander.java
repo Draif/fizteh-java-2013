@@ -139,7 +139,7 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
                 }
                 if (!newFileMap.exists()) {
                     if (!newFileMap.mkdirs()) {
-                        System.err.println("Unable to create this directory - " + name);
+                        //System.err.println("Unable to create this directory - " + name);
                         System.exit(1);
                     }
                 }
