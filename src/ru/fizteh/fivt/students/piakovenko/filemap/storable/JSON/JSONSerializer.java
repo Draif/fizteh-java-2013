@@ -49,20 +49,20 @@ public class JSONSerializer {
                     throw new ColumnFormatException("Serialize: wrong class!");
                 }
                 if (!clazz.equals(String.class)) {
-                    result.append("\"");
-                    result.append(i.toString());
-                    result.append("\":");
+                    //result.append("\"");
+                    //result.append(i.toString());
+                    //result.append("\":");
                     result.append(value.getColumnAt(i).toString());
                 } else {
-                    result.append("\"");
-                    result.append(i.toString());
-                    result.append("\":");
+                    //result.append("\"");
+                    //result.append(i.toString());
+                    //result.append("\":");
                     result.append(value.getStringAt(i));
                 }
             } else {
-                result.append("\"");
-                result.append(i.toString());
-                result.append("\":");
+                //result.append("\"");
+                //result.append(i.toString());
+                //result.append("\":");
                 result.append("null");
             }
             if (i != table.getColumnsCount() - 1) {
