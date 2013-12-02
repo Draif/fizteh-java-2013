@@ -1,6 +1,7 @@
 package ru.fizteh.fivt.students.piakovenko.shell;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ public class CommandsMap {
     }
 
 
-    public void execute(String commandsString) throws IOException {
+    public void execute(String commandsString) throws IOException, ParseException {
         String[] commandsArray = commandsString.trim().split("\\s*;\\s*");
         for (String command : commandsArray) {
             String[] args = command.split("\\s+");
