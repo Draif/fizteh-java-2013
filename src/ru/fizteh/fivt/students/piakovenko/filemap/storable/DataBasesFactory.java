@@ -6,6 +6,7 @@ import ru.fizteh.fivt.students.piakovenko.shell.Shell;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -41,7 +42,7 @@ public class DataBasesFactory implements TableProviderFactory {
         return new DataBasesCommander(shell, fileMapStorage);
     }
 
-    public void start(String[] args) {
+    public void start(String[] args) throws ParseException {
         shell.start(args);
     }
 }

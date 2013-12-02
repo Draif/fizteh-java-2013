@@ -2,6 +2,7 @@ package ru.fizteh.fivt.students.piakovenko.shell;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Scanner;
 
 public class Shell {
@@ -23,6 +24,9 @@ public class Shell {
                 cm.execute(s);
             } catch (IOException e) {
                 System.err.println("Error! " + e.getMessage());
+            }  catch (ParseException e) {
+                System.err.println("Error! " + e.getMessage());
+                System.exit(1);
             }
         }
     }
@@ -37,6 +41,9 @@ public class Shell {
             cm.execute(sb.toString());
             cm.execute("exit");
         } catch (IOException e) {
+            System.err.println("Error! " + e.getMessage());
+            System.exit(1);
+        } catch (ParseException e) {
             System.err.println("Error! " + e.getMessage());
             System.exit(1);
         }
@@ -87,12 +94,5 @@ public class Shell {
         }
     }
 
-    public void executeCommand(String args) throws IOException {
-        cm.execute(args);
-    }
-
-    public void removeCommand(String commandName) throws IOException {
-        cm.removeCommand(commandName);
-    }
 
 }

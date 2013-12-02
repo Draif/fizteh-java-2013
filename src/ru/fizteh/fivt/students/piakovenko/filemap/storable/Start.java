@@ -1,6 +1,7 @@
 package ru.fizteh.fivt.students.piakovenko.filemap.storable;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,6 +27,9 @@ public class Start {
             System.exit(1);
         } catch (IllegalArgumentException e) {
             System.err.println("error while loading: " + e.getMessage());
+            System.exit(1);
+        } catch (ParseException e) {
+            System.err.println("Error! " + e.getMessage());
             System.exit(1);
         }
 

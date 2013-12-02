@@ -3,6 +3,7 @@ package ru.fizteh.fivt.students.piakovenko.filemap;
 import ru.fizteh.fivt.students.piakovenko.shell.Commands;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 
 public class Put implements Commands {
@@ -17,7 +18,7 @@ public class Put implements Commands {
         return name;
     }
 
-    public void perform(String[] args) throws IOException {
+    public void perform(String[] args) throws IOException, ParseException {
         if (!db.isValidTable()) {
             System.out.println("no table");
             return;
