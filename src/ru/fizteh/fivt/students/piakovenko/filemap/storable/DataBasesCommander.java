@@ -224,6 +224,8 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
         File tempFileStorage = filesMap.get(nameOfTable).returnFiledirectory();
         DataBase newTable = new DataBase(shell, tempFileStorage, this, temp);
         newTable.copyStorage(filesMap.get(nameOfTable));
+        filesMap.remove(nameOfTable);
+        filesMap.put(nameOfTable, newTable);
     }
 
     @Override
