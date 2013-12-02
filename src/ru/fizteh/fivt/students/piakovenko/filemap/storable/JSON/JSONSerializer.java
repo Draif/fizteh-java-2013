@@ -41,7 +41,7 @@ public class JSONSerializer {
     }
 
     public static String serialize(Table table, Storeable value) throws ColumnFormatException {
-        StringBuilder result = new StringBuilder("{");
+        StringBuilder result = new StringBuilder("[");
         for (Integer i = 0; i < table.getColumnsCount(); ++i) {
             if (value.getColumnAt(i) != null) {
                 Class<?> clazz = value.getColumnAt(i).getClass();
@@ -68,7 +68,7 @@ public class JSONSerializer {
             if (i != table.getColumnsCount() - 1) {
                 result.append(", ");
             } else {
-                result.append("}");
+                result.append("]");
             }
         }
         return result.toString();
