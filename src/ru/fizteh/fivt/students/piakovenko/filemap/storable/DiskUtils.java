@@ -3,6 +3,7 @@ package ru.fizteh.fivt.students.piakovenko.filemap.storable;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -13,12 +14,15 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class DiskUtils {
+
+
     public static void fixedClasses(File f, List<Class<?>> classList) {
         if (!f.exists()) {
             RandomAccessFile randomAccessFile = null;
             try {
                 randomAccessFile = new RandomAccessFile(f, "rw");
-                randomAccessFile.writeChars(ru.fizteh.fivt.students.piakovenko.filemap.Utils.classesString(classList));
+                randomAccessFile.write(ru.fizteh.fivt.students.piakovenko.filemap.Utils.classesString(classList)
+                        .getBytes(StandardCharsets.UTF_8));
             } catch (IOException e) {
                 //keep silent
             }
