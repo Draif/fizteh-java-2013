@@ -489,6 +489,7 @@ public class DataBase implements Table, AutoCloseable {
             lock.lock();
             int changesCount = transaction.get().commit();
             transaction.get().clearMap();
+            DiskUtils.saveDataBase(this, dataBaseStorage, map);
             return changesCount;
         } finally {
             lock.unlock();
