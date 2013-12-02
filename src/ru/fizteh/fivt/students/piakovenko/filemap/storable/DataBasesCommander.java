@@ -29,6 +29,7 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
     private File dataBaseDirectory = null;
     private DataBase currentDataBase = null;
     private Map<String, DataBase> filesMap = new HashMap<String, DataBase>();
+    private Map<String, Boolean> tablesWasClosed = new HashMap<>();
     private Shell shell = null;
     private GlobalFileMapState state = null;;
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
@@ -159,15 +160,16 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
         try {
             readWriteLock.readLock().lock();
             if (filesMap.containsKey(name)) {
-                //if (!filesMap.get(name).checkForClose()) {
-                return filesMap.get(name);
-                /*} else {
+                if (!tablesWasClosed.containsKey(name)) {
+                    return filesMap.get(name);
+                } else {
                     List<Class<?>> temp = filesMap.get(name).storableClasses();
                     File tempFileStorage = filesMap.get(name).returnFiledirectory();
                     filesMap.remove(name);
                     filesMap.put(name, new DataBase(shell, tempFileStorage, this, temp));
+                    tablesWasClosed.remove(name);
                     return filesMap.get(name);
-                } */
+                }
             } else {
                 return null;
             }
@@ -225,6 +227,10 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
 
     public String fullTablePath(String name) {
         return path + File.separator + name;
+    }
+
+    public void closeTable(String nameOfTable) {
+        tablesWasClosed.put(nameOfTable, true);
     }
 
     @Override
