@@ -105,9 +105,13 @@ public class GlobalFileMapState {
         }
     }
 
-    public void put(String key, String value) throws IOException, ParseException {
+    public void put(String key, String value) throws IOException {
         if (isStoreableMode) {
-            tableStoreable.put(key, JSONSerializer.deserialize(tableStoreable, value));
+            try {
+                tableStoreable.put(key, JSONSerializer.deserialize(tableStoreable, value));
+            } catch (ParseException e) {
+                throw new IOException(e.getCause());
+            }
         } else {
             tableStrings.put(key, value);
         }
