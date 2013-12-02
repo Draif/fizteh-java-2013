@@ -56,6 +56,17 @@ public enum ColumnTypes {
     private final Class<?> type;
     private static Map<String, ColumnTypes> nameByClass;
     private static Map<Class<?>, ColumnTypes> classByName;
+    public static Map<String, Class<?>> typesNames = new HashMap<>();
+    
+    static {
+        typesNames.put("boolean", Boolean.class);
+        typesNames.put("byte", Byte.class);
+        typesNames.put("int", Integer.class);
+        typesNames.put("long", Long.class);
+        typesNames.put("float", Float.class);
+        typesNames.put("double", Double.class);
+        typesNames.put("String", String.class);
+    }
 
     private ColumnTypes(String name, Class<?> type) {
         this.name = name;

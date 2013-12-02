@@ -5,6 +5,7 @@ import ru.fizteh.fivt.students.piakovenko.filemap.storable.ColumnTypes;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
@@ -29,7 +30,12 @@ public class Utils {
     public static String classesString(List<Class<?>> classList) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < classList.size(); ++i) {
-            sb.append(ColumnTypes.fromTypeToName(classList.get(i)));
+            for (Map.Entry<String, Class<?>> entry : ColumnTypes.typesNames.entrySet()) {
+                if (entry.getValue().equals(classList.get(i))) {
+                    sb.append(entry.getKey());
+                    break;
+                }
+            }
             if (i != classList.size() - 1) {
                 sb.append(" ");
             }
