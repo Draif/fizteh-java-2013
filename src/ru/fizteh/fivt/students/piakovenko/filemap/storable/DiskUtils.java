@@ -17,7 +17,7 @@ public class DiskUtils {
         if (!f.exists()) {
             RandomAccessFile randomAccessFile = null;
             try {
-                randomAccessFile = new RandomAccessFile(f, "w");
+                randomAccessFile = new RandomAccessFile(f, "rw");
                 randomAccessFile.writeChars(ru.fizteh.fivt.students.piakovenko.filemap.Utils.classesString(classList));
             } catch (IOException e) {
                 //keep silent
