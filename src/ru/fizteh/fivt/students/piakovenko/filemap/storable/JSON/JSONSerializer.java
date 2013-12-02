@@ -34,7 +34,7 @@ public class JSONSerializer {
                 newStoreable.setColumnAt(i, temp);
             }
         } catch (JSONException e) {
-            System.err.println("Error with JSON!" + e.getMessage());
+            //System.err.println("Error with JSON!" + e.getMessage());
             return null;
         }
         return newStoreable;

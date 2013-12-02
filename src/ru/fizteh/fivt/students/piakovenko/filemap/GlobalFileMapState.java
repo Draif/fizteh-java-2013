@@ -2,8 +2,12 @@ package ru.fizteh.fivt.students.piakovenko.filemap;
 
 import ru.fizteh.fivt.storage.strings.Table;
 import ru.fizteh.fivt.storage.strings.TableProvider;
+import ru.fizteh.fivt.students.piakovenko.filemap.storable.DataBase;
+import ru.fizteh.fivt.students.piakovenko.filemap.storable.DataBasesCommander;
+import ru.fizteh.fivt.students.piakovenko.filemap.storable.JSON.JSONSerializer;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,22 +17,22 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class GlobalFileMapState {
-    private Table tableStrings = null;
-    private ru.fizteh.fivt.storage.structured.Table tableStoreable = null;
-    private TableProvider tableProviderStrings = null;
-    private ru.fizteh.fivt.storage.structured.TableProvider tableProviderStoreable = null;
+    private ru.fizteh.fivt.students.piakovenko.filemap.strings.DataBase tableStrings  = null;
+    private DataBase tableStoreable = null;
+    private ru.fizteh.fivt.students.piakovenko.filemap.strings.DataBasesCommander tableProviderStrings = null;
+    private DataBasesCommander tableProviderStoreable = null;
     private boolean isStoreableMode = false;
 
     public GlobalFileMapState() {
     }
 
-    public GlobalFileMapState(Table table, TableProvider tableProvider) {
+    public GlobalFileMapState(ru.fizteh.fivt.students.piakovenko.filemap.strings.DataBase table,
+                              ru.fizteh.fivt.students.piakovenko.filemap.strings.DataBasesCommander tableProvider) {
         tableStrings = table;
         tableProviderStrings = tableProvider;
     }
 
-    public GlobalFileMapState(ru.fizteh.fivt.storage.structured.Table table,
-                              ru.fizteh.fivt.storage.structured.TableProvider tableProvider) {
+    public GlobalFileMapState(DataBase table, DataBasesCommander tableProvider) {
         tableStoreable = table;
         tableProviderStoreable = tableProvider;
         isStoreableMode = true;
@@ -47,14 +51,15 @@ public class GlobalFileMapState {
         return true;
     }
 
-    public void changeTable(Table table) throws IllegalArgumentException {
+    public void changeTable(ru.fizteh.fivt.students.piakovenko.filemap.strings.DataBase table) throws
+            IllegalArgumentException {
         if (isStoreableMode) {
             throw new IllegalArgumentException("GFMS: changeTable: Storeable mode is on!");
         }
         tableStrings = table;
     }
 
-    public void changeTable(ru.fizteh.fivt.storage.structured.Table table) {
+    public void changeTable(ru.fizteh.fivt.students.piakovenko.filemap.storable.DataBase table) {
         if (!isStoreableMode) {
             throw new IllegalArgumentException("GFMS: changeTable: Storeable mode is off!");
         }
@@ -67,9 +72,10 @@ public class GlobalFileMapState {
         }
     }
 
-    public void createTable(String name) throws IllegalArgumentException {
+    public void createTable(String name) throws IllegalArgumentException, IOException {
         if (isStoreableMode) {
-            //do nothing
+            tableProviderStoreable.createTable(name.substring(0, name.indexOf(' ')),
+                    Utils.arrayList(name.substring(name.indexOf(' ') + 1)));
         } else {
             tableProviderStrings.createTable(name);
         }
@@ -100,7 +106,13 @@ public class GlobalFileMapState {
     }
 
     public void put(String key, String value) throws IOException {
-        if (!isStoreableMode) {
+        if (isStoreableMode) {
+            try {
+                tableStoreable.put(key, JSONSerializer.deserialize(tableStoreable, value));
+            } catch (ParseException e)  {
+                throw new IOException(e.getCause());
+            }
+        } else {
             tableStrings.put(key, value);
         }
     }
@@ -130,6 +142,10 @@ public class GlobalFileMapState {
     }
 
     public void use(String name) throws IOException {
-        throw new IOException("GFMS: use: Sorry, this method was depritiated!:(");
+        if (isStoreableMode) {
+            tableProviderStoreable.use(name);
+        } else {
+            tableProviderStrings.use(name);
+        }
     }
 }
