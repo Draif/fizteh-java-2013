@@ -65,7 +65,7 @@ public class DiskUtils {
                 saveToFile(writeFile, key, JSONSerializer.serialize(dataBase, map.get(key)));
             }
         } catch (IOException e) {
-            //new RuntimeException("can't save file!");
+            new RuntimeException("can't save file!");
         }
     }
 
