@@ -6,9 +6,8 @@ import ru.fizteh.fivt.students.piakovenko.shell.Shell;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,32 +16,39 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * Time: 23:58
  * To change this template use File | Settings | File Templates.
  */
-public class DataBasesFactory implements TableProviderFactory {
+public class DataBasesFactory implements TableProviderFactory, AutoCloseable {
     private Shell shell = null;
-    private final ReadWriteLock lock = new ReentrantReadWriteLock(true);
+    private StateOfDataBase stateOfDataBase = new StateOfDataBase();
+    private Map<String, DataBasesCommander> commanders = new HashMap<String, DataBasesCommander>();
 
-    public TableProvider create(String dir) throws IllegalArgumentException, IOException {
+    public synchronized TableProvider create(String dir)
+            throws IllegalArgumentException, IOException, IllegalStateException {
+        stateOfDataBase.check();
         Checker.stringNotEmpty(dir);
-        File fileMapStorage = null;
-        try {
-            lock.writeLock().lock();
-            fileMapStorage = new File(dir);
-            if (fileMapStorage.isFile()) {
-                throw new IllegalArgumentException("try create provider on file");
-            }
-            if (!fileMapStorage.exists()) {
-                if (!fileMapStorage.mkdir()) {
-                    throw new IOException("Can't create the directory " + fileMapStorage.getCanonicalPath());
-                }
-            }
-            shell = new Shell();
-        } finally {
-            lock.writeLock().unlock();
+        File fileMapStorage;
+        fileMapStorage = new File(dir);
+        if (fileMapStorage.isFile()) {
+            throw new IllegalArgumentException("try create provider on file");
         }
-        return new DataBasesCommander(shell, fileMapStorage);
+        if (!fileMapStorage.exists()) {
+            if (!fileMapStorage.mkdir()) {
+                throw new IOException("Can't create the directory " + fileMapStorage.getCanonicalPath());
+            }
+        }
+        shell = new Shell();
+        commanders.put(dir, new DataBasesCommander(shell, fileMapStorage, dir));
+        return commanders.get(dir);
     }
 
-    public void start(String[] args) throws ParseException {
+    public void start(String[] args) {
         shell.start(args);
+    }
+
+    @Override
+    public synchronized void close() {
+        for (final DataBasesCommander temp: commanders.values()) {
+            temp.close();
+        }
+        stateOfDataBase.change(false);
     }
 }

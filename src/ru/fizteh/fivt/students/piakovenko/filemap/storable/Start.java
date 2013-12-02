@@ -28,10 +28,6 @@ public class Start {
         } catch (IllegalArgumentException e) {
             System.err.println("error while loading: " + e.getMessage());
             System.exit(1);
-        } catch (ParseException e) {
-            System.err.println("Error! " + e.getMessage());
-            System.exit(1);
         }
-
     }
 }

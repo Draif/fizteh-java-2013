@@ -10,7 +10,6 @@ package ru.fizteh.fivt.students.piakovenko.filemap.storable;
 
 import ru.fizteh.fivt.storage.structured.ColumnFormatException;
 import ru.fizteh.fivt.storage.structured.Storeable;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,26 +33,22 @@ public class Element implements Storeable {
 
 
     public Element(List<Class<?>> classes) {
-        storageClasses = new ArrayList<Class<?>>(classes);
-        storage = new ArrayList<Object>();
-        for (int i = 0; i < storageClasses.size(); ++i) {
+        storageClasses = new ArrayList<>();
+        storage = new ArrayList<>();
+        for (int i = 0; i < classes.size(); ++i) {
             storage.add(null);
+            storageClasses.add(classes.get(i));
         }
     }
 
     public void setColumnAt(int columnIndex, Object value) throws ColumnFormatException, IndexOutOfBoundsException {
-        classChecker(columnIndex, value.getClass());
         if (!columnChecker(columnIndex)) {
             throw  new IndexOutOfBoundsException("setColumnAt - wrong index!");
         }
         if (value != null) {
-            classChecker(columnIndex, value.getClass());
-            if ((value.getClass().getName().equals("java.lang.String"))
-                    && ((String) value).trim().isEmpty()) {
-                storage.set(columnIndex, value);
-                return;
+            if (value.getClass() != storageClasses.get(columnIndex)) {
+                throw new ColumnFormatException("Wrong column type!");
             }
-            classChecker(columnIndex, value.getClass());
         }
         storage.set(columnIndex, value);
     }
@@ -124,12 +119,29 @@ public class Element implements Storeable {
     @Override
      public boolean equals(Object obj) {
         Element row = (Element) obj;
-        return row.storageClasses.equals(storageClasses) && row.storage.equals(storage);
+        return row.toString().equals(toString());
     }
 
     @Override
     public int hashCode() {
         return 0;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getClass().getSimpleName());
+        sb.append("[");
+        for (int i = 0; i < storage.size(); ++i) {
+            if (storage.get(i) != null) {
+                sb.append(storage.get(i).toString());
+            }
+            if (i != storage.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
 }

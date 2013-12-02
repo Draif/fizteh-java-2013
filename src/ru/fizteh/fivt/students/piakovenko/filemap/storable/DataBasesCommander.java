@@ -25,13 +25,15 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * Time: 20:17
  * To change this template use File | Settings | File Templates.
  */
-public class DataBasesCommander implements TableProvider {
+public class DataBasesCommander implements TableProvider, AutoCloseable {
     private File dataBaseDirectory = null;
     private DataBase currentDataBase = null;
     private Map<String, DataBase> filesMap = new HashMap<String, DataBase>();
     private Shell shell = null;
     private GlobalFileMapState state = null;;
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
+    private String path = null;
+    private StateOfDataBase stateOfDataBase = new StateOfDataBase();
 
     private static File getMode(File directory) {
         for (File f: directory.listFiles()) {
@@ -48,7 +50,8 @@ public class DataBasesCommander implements TableProvider {
         }
     }
 
-    public DataBasesCommander(Shell s, File storage) {
+    public DataBasesCommander(Shell s, File storage, String dir) {
+        path = dir;
         shell = s;
         dataBaseDirectory = storage;
         File modeFile = null;
@@ -65,14 +68,15 @@ public class DataBasesCommander implements TableProvider {
         }
     }
 
-    public void use(String dataBase) throws IOException {
+    public void use(String dataBase) throws IOException, IllegalStateException {
+        stateOfDataBase.check();
         if (filesMap.containsKey(dataBase)) {
             if (currentDataBase != null && currentDataBase.numberOfChanges() != 0) {
-                System.out.println(currentDataBase.numberOfChanges() + " unsaved changes");
+                //System.out.println(currentDataBase.numberOfChanges() + " unsaved changes");
                 return;
             }
             if (filesMap.get(dataBase).equals(currentDataBase)) {
-                System.out.println("using " + dataBase);
+                //System.out.println("using " + dataBase);
                 return;
             }  else if (currentDataBase != null) {
                 currentDataBase.saveDataBase();
@@ -80,14 +84,15 @@ public class DataBasesCommander implements TableProvider {
             currentDataBase = filesMap.get(dataBase);
             currentDataBase.load();
             state.changeTable(currentDataBase);
-            System.out.println("using " + dataBase);
+           // System.out.println("using " + dataBase);
         } else {
-            System.out.println(dataBase + " not exists");
+            //System.out.println(dataBase + " not exists");
         }
     }
 
     @Override
-    public void removeTable(String dataBase) throws IllegalArgumentException, IOException {
+    public void removeTable(String dataBase) throws IllegalArgumentException, IOException, IllegalStateException {
+        stateOfDataBase.check();
         if (dataBase == null || dataBase.trim().equals("")) {
             throw new IllegalArgumentException("Null pointer to dataBase name");
         }
@@ -98,17 +103,17 @@ public class DataBasesCommander implements TableProvider {
                     currentDataBase = null;
                     state.changeTable(currentDataBase);
                 }
-                try {
+                /*try {
                     ru.fizteh.fivt.students.piakovenko.shell.Remove.removeRecursively(
                             filesMap.get(dataBase).returnFiledirectory());
                 } catch (IOException e) {
                     System.err.println("Error! " + e.getMessage());
                     System.exit(1);
-                }
+                }*/
                 filesMap.remove(dataBase);
-                System.out.println("dropped");
+                //System.out.println("dropped");
             } else {
-                System.out.println(dataBase + " not exists");
+                //System.out.println(dataBase + " not exists");
                 throw new IllegalStateException(dataBase + " not exists");
             }
         } finally {
@@ -117,41 +122,52 @@ public class DataBasesCommander implements TableProvider {
     }
 
     @Override
-    public Table createTable(String name, List<Class<?>> columnTypes) throws IOException, IllegalArgumentException {
+    public Table createTable(String name, List<Class<?>> columnTypes)
+            throws IOException, IllegalArgumentException, IllegalStateException {
+        stateOfDataBase.check();
         Checker.stringNotEmpty(name);
         Checker.correctTableName(name);
         Checker.checkColumnTypes(columnTypes);
         try {
             readWriteLock.writeLock().lock();
             if (filesMap.containsKey(name)) {
-                System.out.println(name + " exists");
+                return null;
             } else {
                 File newFileMap = new File(dataBaseDirectory, name);
                 if (newFileMap.isFile()) {
                     throw new IllegalArgumentException("try create table on file");
                 }
-                if (!newFileMap.mkdirs()) {
-                    System.err.println("Unable to create this directory - " + name);
-                    System.exit(1);
+                if (!newFileMap.exists()) {
+                    if (!newFileMap.mkdirs()) {
+                        System.err.println("Unable to create this directory - " + name);
+                        System.exit(1);
+                    }
                 }
-                System.out.println("created");
                 filesMap.put(name, new DataBase(shell, newFileMap, this, columnTypes));
                 return filesMap.get(name);
             }
-            return null;
         } finally {
             readWriteLock.writeLock().unlock();
         }
     }
 
     @Override
-    public Table getTable(String name) throws IllegalArgumentException {
+    public Table getTable(String name) throws IllegalArgumentException, IllegalStateException {
+        stateOfDataBase.check();
         Checker.stringNotEmpty(name);
         Checker.correctTableName(name);
         try {
             readWriteLock.readLock().lock();
             if (filesMap.containsKey(name)) {
-                return filesMap.get(name);
+                if (!filesMap.get(name).checkForClose()) {
+                    return filesMap.get(name);
+                } else {
+                    List<Class<?>> temp = filesMap.get(name).storableClasses();
+                    File tempFileStorage = filesMap.get(name).returnFiledirectory();
+                    filesMap.remove(name);
+                    filesMap.put(name, new DataBase(shell, tempFileStorage, this, temp));
+                    return filesMap.get(name);
+                }
             } else {
                 return null;
             }
@@ -160,7 +176,8 @@ public class DataBasesCommander implements TableProvider {
         }
     }
 
-    public Storeable deserialize(Table table, String value) throws ParseException {
+    public Storeable deserialize(Table table, String value) throws ParseException, IllegalStateException {
+        stateOfDataBase.check();
         return JSONSerializer.deserialize(table, value);
     }
 
@@ -168,7 +185,8 @@ public class DataBasesCommander implements TableProvider {
         return JSONSerializer.serialize(table, value);
     }
 
-    public Storeable createFor(Table table) {
+    public Storeable createFor(Table table) throws IllegalStateException {
+        stateOfDataBase.check();
         List<Class<?>> typesList = new ArrayList<Class<?>>();
         for (int i = 0; i < table.getColumnsCount(); ++i) {
             typesList.add(table.getColumnType(i));
@@ -176,7 +194,9 @@ public class DataBasesCommander implements TableProvider {
         return new Element(typesList);
     }
 
-    public Storeable createFor(Table table, List<?> values) throws ColumnFormatException, IndexOutOfBoundsException {
+    public Storeable createFor(Table table, List<?> values)
+            throws ColumnFormatException, IndexOutOfBoundsException, IllegalStateException {
+        stateOfDataBase.check();
         Checker.equalSizes(values.size(), table.getColumnsCount());
         List<Class<?>> typesList = new ArrayList<Class<?>>();
         for (int i = 0; i < table.getColumnsCount(); ++i) {
@@ -200,5 +220,24 @@ public class DataBasesCommander implements TableProvider {
         shell.addCommand(new Size(state));
         shell.addCommand(new Commit(state));
         shell.addCommand(new Rollback(state));
+    }
+
+
+    public String fullTablePath(String name) {
+        return path + File.separator + name;
+    }
+
+    @Override
+    public String toString() throws IllegalStateException {
+        stateOfDataBase.check();
+        return this.getClass().getSimpleName() + "[" + path + "]";
+    }
+
+    @Override
+    public synchronized void close() {
+        for (final DataBase temp: filesMap.values()) {
+            temp.close();
+        }
+        stateOfDataBase.change(false);
     }
 }
