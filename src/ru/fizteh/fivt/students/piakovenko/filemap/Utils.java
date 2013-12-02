@@ -25,4 +25,15 @@ public class Utils {
         }
         return resultList;
     }
+
+    public static String classesString(List<Class<?>> classList) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < classList.size(); ++i) {
+            sb.append(ColumnTypes.fromTypeToName(classList.get(i)));
+            if (i != classList.size() - 1) {
+                sb.append(" ");
+            }
+        }
+        return sb.toString();
+    }
 }
