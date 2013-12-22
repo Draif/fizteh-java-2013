@@ -3,15 +3,12 @@ package ru.fizteh.fivt.students.piakovenko.filemap.strings;
 import ru.fizteh.fivt.storage.strings.Table;
 import ru.fizteh.fivt.storage.strings.TableProvider;
 import ru.fizteh.fivt.students.piakovenko.filemap.*;
-import ru.fizteh.fivt.students.piakovenko.filemap.storable.JSON.JSONSerializer;
 import ru.fizteh.fivt.students.piakovenko.shell.Shell;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,18 +17,16 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * Time: 20:17
  * To change this template use File | Settings | File Templates.
  */
-public class DataBasesCommander implements TableProvider, AutoCloseable {
+public class DataBasesCommander implements TableProvider {
     private File dataBaseDirectory = null;
     private DataBase currentDataBase = null;
     private Map<String, DataBase> filesMap = new HashMap<String, DataBase>();
-    private Map<String, StateOfDataBase> statesMap = new HashMap<String, StateOfDataBase>();
     private Shell shell = null;
-    private GlobalFileMapState state = null;;
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
-    private boolean isValid = true;
+    private GlobalFileMapState state = null;
+    private static final String TABLE_NAME_FORMAT = "[A-Za-zА-Яа-я0-9]+";
 
     private static File getMode(File directory) {
-        for (File f: directory.listFiles()) {
+        for (File f : directory.listFiles()) {
             if (f.getName().equals("db.dat") && f.isFile()) {
                 return f;
             }
@@ -40,8 +35,26 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
     }
 
     private void fulfillFiles() {
-        for (File f: dataBaseDirectory.listFiles()) {
-            filesMap.put(f.getName(), new DataBase(shell, f, this));
+        for (File f : dataBaseDirectory.listFiles()) {
+            filesMap.put(f.getName(), new DataBase(shell, f));
+        }
+    }
+
+
+    public DataBasesCommander() {
+        shell = new Shell();
+        dataBaseDirectory = new File(System.getProperty("fizteh.db.dir"));
+        File modeFile = null;
+        if ((modeFile = getMode(dataBaseDirectory)) != null) {
+            currentDataBase = new DataBase(shell, modeFile);
+            state = new GlobalFileMapState(currentDataBase, this);
+            currentDataBase.initialize(state);
+            shell.changeInvitation("Database $ ");
+        } else {
+            state = new GlobalFileMapState(currentDataBase, this);
+            fulfillFiles();
+            initialize(state);
+            shell.changeInvitation("MultiFile Database $ ");
         }
     }
 
@@ -50,22 +63,19 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
         dataBaseDirectory = storage;
         File modeFile = null;
         if ((modeFile = getMode(storage)) != null) {
-            currentDataBase = new DataBase(shell, modeFile, this);
-            state  = new GlobalFileMapState(currentDataBase, this);
+            currentDataBase = new DataBase(shell, modeFile);
+            state = new GlobalFileMapState(currentDataBase, this);
             currentDataBase.initialize(state);
-            shell.changeInvitation(" $ ");
+            shell.changeInvitation("Database $ ");
         } else {
             fulfillFiles();
             state = new GlobalFileMapState(currentDataBase, this);
             initialize(state);
-            shell.changeInvitation(" $ ");
+            shell.changeInvitation("MultiFile Database $ ");
         }
     }
 
-    public void use(String dataBase) throws IOException, IllegalStateException {
-        if (!isValid) {
-            throw new IllegalStateException("TableFactory is invalid");
-        }
+    public void use(String dataBase) throws IOException {
         if (filesMap.containsKey(dataBase)) {
             if (currentDataBase != null && currentDataBase.numberOfChanges() != 0) {
                 //System.out.println(currentDataBase.numberOfChanges() + " unsaved changes");
@@ -86,44 +96,36 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
         }
     }
 
-
-    @Override
-    public void removeTable(String dataBase) throws IllegalArgumentException, IOException, IllegalStateException {
-        if (!isValid) {
-            throw new IllegalStateException("TableFactory is invalid");
-        }
+    public void removeTable(String dataBase) throws IllegalArgumentException {
         if (dataBase == null || dataBase.trim().equals("")) {
             throw new IllegalArgumentException("Null pointer to dataBase name");
         }
-        try {
-            readWriteLock.writeLock().lock();
-            if (filesMap.containsKey(dataBase)) {
-                if (filesMap.get(dataBase).equals(currentDataBase)) {
-                    currentDataBase = null;
-                    state.changeTable(currentDataBase);
-                }
-                try {
-                    ru.fizteh.fivt.students.piakovenko.shell.Remove.removeRecursively(
-                            filesMap.get(dataBase).returnFiledirectory());
-                } catch (IOException e) {
-                    System.err.println("Error! " + e.getMessage());
-                    System.exit(1);
-                }
-                filesMap.remove(dataBase);
-                System.out.println("dropped");
-            } else {
-                System.out.println(dataBase + " not exists");
-                throw new IllegalStateException(dataBase + " not exists");
+        if (filesMap.containsKey(dataBase)) {
+            if (filesMap.get(dataBase).equals(currentDataBase)) {
+                currentDataBase = null;
+                state.changeTable(currentDataBase);
             }
-		} finally {
-			readWriteLock.writeLock.unlock();
-		}
+            try {
+                ru.fizteh.fivt.students.piakovenko.shell.Remove.removeRecursively(
+                        filesMap.get(dataBase).returnFiledirectory());
+            } catch (IOException e) {
+                //System.err.println("Error! " + e.getMessage());
+                System.exit(1);
+            }
+            filesMap.remove(dataBase);
+            //System.out.println("dropped");
+        } else {
+            //System.out.println(dataBase + " not exists");
+            throw new IllegalStateException(dataBase + " not exists");
+        }
     }
 
-    @Override
-    public Table createTable(String name, List<Class<?>> columnTypes) throws IOException, IllegalArgumentException, IllegalStateException {
-        if (!isValid) {
-            throw new IllegalStateException("TableFactory is invalid");
+    public Table createTable(String dataBase) throws IllegalArgumentException {
+        if (dataBase == null || dataBase.trim().equals("")) {
+            throw new IllegalArgumentException("Null pointer to name!");
+        }
+        if (!dataBase.matches(TABLE_NAME_FORMAT)) {
+            throw new RuntimeException("incorrect table name");
         }
         if (filesMap.containsKey(dataBase)) {
             //System.out.println(dataBase + " exists");
@@ -140,44 +142,20 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
             filesMap.put(dataBase, new DataBase(shell, newFileMap));
             return filesMap.get(dataBase);
         }
+        return null;
     }
 
-    public Storeable deserialize(Table table, String value) throws ParseException, IllegalStateException {
-        if (!isValid) {
-            throw new IllegalStateException("TableFactory is invalid");
+    public Table getTable(String name) throws IllegalArgumentException {
+        if (name == null || name.trim().equals("")) {
+            throw new IllegalArgumentException("Null pointer to name of Table");
         }
-        return JSONSerializer.deserialize(table, value);
-    }
-
-    public String serialize(Table table, Storeable value) throws ColumnFormatException {
-        return JSONSerializer.serialize(table, value);
-    }
-
-    public Storeable createFor(Table table) throws IllegalStateException {
-        if (!isValid) {
-            throw new IllegalStateException("TableFactory is invalid");
+        if (!name.matches(TABLE_NAME_FORMAT)) {
+            throw new RuntimeException("incorrect table name");
         }
-        List<Class<?>> typesList = new ArrayList<Class<?>>();
-        for (int i = 0; i < table.getColumnsCount(); ++i) {
-            typesList.add(table.getColumnType(i));
+        if (filesMap.containsKey(name)) {
+            return filesMap.get(name);
         }
-        return new Element(typesList);
-    }
-
-    public Storeable createFor(Table table, List<?> values) throws ColumnFormatException, IndexOutOfBoundsException, IllegalStateException {
-        if (!isValid) {
-            throw new IllegalStateException("TableFactory is invalid");
-        }
-        Checker.equalSizes(values.size(), table.getColumnsCount());
-        List<Class<?>> typesList = new ArrayList<Class<?>>();
-        for (int i = 0; i < table.getColumnsCount(); ++i) {
-            typesList.add(table.getColumnType(i));
-        }
-        Storeable result = new Element(typesList);
-        for (int i = 0; i < table.getColumnsCount(); ++i) {
-            result.setColumnAt(i, values.get(i));
-        }
-        return result;
+        return null;
     }
 
     public void initialize(GlobalFileMapState state) {
@@ -193,43 +171,4 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
         shell.addCommand(new Rollback(state));
     }
 
-    public boolean isDataBaseValid(String name) {
-        try {
-            readWriteLock.readLock().lock();
-            return statesMap.get(name).check();
-        } finally {
-            readWriteLock.readLock().unlock();
-        }
-    }
-
-    public void changeDataBaseState(String name, boolean flag) {
-        try {
-            statesMap.get(name).change(flag);
-        } finally {
-            readWriteLock.writeLock().unlock();
-        }
-    }
-
-    @Override
-    public String toString() throws IllegalStateException {
-        if (!isValid) {
-            throw new IllegalStateException("TableFactory is invalid");
-        }
-        String storage = null;
-        try {
-            storage = dataBaseDirectory.getCanonicalPath();
-        } catch (IOException e) {
-            System.err.println("Error with Database.toString()");
-            System.exit(1432);
-        }
-        return this.getClass().getSimpleName() + "[" + storage + "]";
-    }
-
-    @Override
-    public void close() {
-        for (final DataBase temp: filesMap.values()) {
-            temp.close();
-        }
-        isValid = false;
-    }
 }
