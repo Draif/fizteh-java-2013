@@ -46,7 +46,7 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
 
     private void fulfillFiles() {
         for (File f: dataBaseDirectory.listFiles()) {
-            filesMap.put(f.getName(), new DataBase(shell, f, this));
+            //filesMap.put(f.getName(), new DataBase(shell, f, this));
         }
     }
 
@@ -56,7 +56,7 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
         dataBaseDirectory = storage;
         File modeFile = null;
         if ((modeFile = getMode(storage)) != null) {
-            currentDataBase = new DataBase(shell, modeFile, this);
+            //currentDataBase = new DataBase(shell, modeFile, this);
             state  = new GlobalFileMapState(currentDataBase, this);
             currentDataBase.initialize(state);
             shell.changeInvitation(" $ ");

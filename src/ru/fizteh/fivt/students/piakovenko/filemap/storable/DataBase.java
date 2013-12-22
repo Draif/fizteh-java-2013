@@ -363,7 +363,7 @@ public class DataBase implements Table, AutoCloseable {
         };
     }
 
-    public DataBase(Shell sl, File storage, DataBasesCommander parent) {
+    /*public DataBase(Shell sl, File storage, DataBasesCommander parent) {
         map = new HashMap<String, Storeable>();
         this.parent = parent;
         shell  = sl;
@@ -375,7 +375,7 @@ public class DataBase implements Table, AutoCloseable {
                 return new Transaction();
             }
         };
-    }
+    }   */
 
     public Map<String, Storeable> returnStorage() {
         return map;
