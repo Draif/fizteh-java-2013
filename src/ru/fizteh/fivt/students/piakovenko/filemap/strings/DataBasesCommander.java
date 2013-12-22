@@ -115,19 +115,6 @@ public class DataBasesCommander implements TableProvider, AutoCloseable {
                 System.out.println(dataBase + " not exists");
                 throw new IllegalStateException(dataBase + " not exists");
             }
-            try {
-                ru.fizteh.fivt.students.piakovenko.shell.Remove.removeRecursively(
-                        filesMap.get(dataBase).returnFiledirectory());
-            } catch (IOException e) {
-                //System.err.println("Error! " + e.getMessage());
-                System.exit(1);
-            }
-            filesMap.remove(dataBase);
-            //System.out.println("dropped");
-			} else {
-				//System.out.println(dataBase + " not exists");
-				throw new IllegalStateException(dataBase + " not exists");
-			}
 		} finally {
 			readWriteLock.writeLock.unlock();
 		}
